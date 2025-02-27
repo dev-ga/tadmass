@@ -15,4 +15,10 @@ class Almacen extends Model
         'responsable_almacen',
         'registrado_por'
         ];
+
+    //belognsto tabla productos
+    public function producto()    
+    {
+        return $this->belongsTo(Producto::class);
+    }
 }

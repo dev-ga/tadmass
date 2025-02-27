@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('direccion');
             $table->string('telefono');
-            //Responsable de almacen
             $table->string('responsable_almacen')->nullable();
             $table->string('registrado_por');
             $table->timestamps();

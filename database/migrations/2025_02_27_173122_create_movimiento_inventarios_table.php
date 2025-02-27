@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('movimiento_inventarios', function (Blueprint $table) {
             $table->id();
+            //codigo
+            $table->string('codigo')->unique();
             $table->string('producto_id');
             $table->string('categoria_id');
             $table->integer('cantidad');

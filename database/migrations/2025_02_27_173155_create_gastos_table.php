@@ -31,6 +31,9 @@ return new class extends Migration
             $table->decimal('conversion_usd', 8, 2)->default(0.00);
             $table->string('registrado_por')->default(0.00);
             $table->timestamps();
+            //$parte_entera = intval(str_replace('Pcf-', '', $ultimo_correlativo->numero_factura));
+            //$sum_correlativo = $parte_entera + 1;
+            //$gasto->numero_factura = 'Pcf-'.str_pad($sum_correlativo, 6, '0', STR_PAD_LEFT);
         });
     }
 
