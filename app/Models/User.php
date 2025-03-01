@@ -56,7 +56,15 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
     public function canAccessPanel(Panel $panel): bool
     {
         // return str_ends_with($this->email, '@piedyadmin.com') && $this->hasVerifiedEmail();
-        return $this->hasVerifiedEmail();
+        // return $this->hasVerifiedEmail();
+
+        if ($panel->getId() === 'admin') {
+            return str_contains($this->email, 'admin@tadmass.com') && $this->hasVerifiedEmail();
+        } else if ($panel->getId() === 'employee') {
+            return str_contains($this->email, 'employee@tadmass.com') && $this->hasVerifiedEmail();
+        }
+
+        return false;
     }
 
     public function getFilamentName(): string
