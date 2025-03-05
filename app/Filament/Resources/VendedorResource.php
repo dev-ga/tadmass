@@ -17,7 +17,7 @@ class VendedorResource extends Resource
 {
     protected static ?string $model = Vendedor::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-c-user-plus';
 
     public static function form(Form $form): Form
     {

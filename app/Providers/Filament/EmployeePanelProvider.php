@@ -21,14 +21,15 @@ use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 class EmployeePanelProvider extends PanelProvider
 {
+    
     public function panel(Panel $panel): Panel
     {
         return $panel
             ->id('employee')
             ->path('employee')
             ->login()
-            ->registration()
             ->profile()
+            ->passwordReset()
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -58,6 +59,7 @@ class EmployeePanelProvider extends PanelProvider
             ])
             ->renderHook(PanelsRenderHook::TOPBAR_END, function () {
                 return view('topbar-end-bcv');
-            });
+            })
+            ->sidebarCollapsibleOnDesktop();
     }
 }

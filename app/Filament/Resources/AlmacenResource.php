@@ -17,7 +17,7 @@ class AlmacenResource extends Resource
 {
     protected static ?string $model = Almacen::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-c-building-library';
 
     public static function form(Form $form): Form
     {
