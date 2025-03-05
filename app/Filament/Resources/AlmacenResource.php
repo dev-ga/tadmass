@@ -2,16 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AlmacenResource\Pages;
-use App\Filament\Resources\AlmacenResource\RelationManagers;
-use App\Models\Almacen;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use App\Models\User;
 use Filament\Tables;
+use App\Models\Almacen;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\AlmacenResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\AlmacenResource\RelationManagers;
 
 class AlmacenResource extends Resource
 {
@@ -23,21 +26,41 @@ class AlmacenResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('direccion')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('telefono')
-                    ->tel()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('responsable_almacen')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('registrado_por')
-                    ->required()
-                    ->maxLength(255),
+            Forms\Components\Section::make('ALMACENES')
+                ->description('Formulario de registro de Almacenes. Campos Requeridos(*)')
+                ->icon('heroicon-c-building-library')
+                ->schema([
+
+                    Forms\Components\TextInput::make('nombre')
+                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                        ->label('Nombre de Almacen')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('direccion')
+                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                        ->label('Direccion del Almacen')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('telefono')
+                        ->prefixIcon('heroicon-m-phone')
+                        ->label('Telefono')
+                        ->tel()
+                        ->required()
+                        ->maxLength(255),
+                    Select::make('responsable_almacen')
+                        ->prefixIcon('heroicon-m-numbered-list')
+                        ->label('Responsable del Almacen')
+                        ->options(User::all()->pluck('name', 'id'))
+                        ->searchable(),
+                    Forms\Components\TextInput::make('registrado_por')
+                        ->prefixIcon('heroicon-s-shield-check')
+                        ->default(Auth::user()->name)
+                        ->disabled()
+                        ->dehydrated()
+                        ->maxLength(255),
+
+
+                ])->columns(2),
             ]);
     }
 
@@ -91,5 +114,10 @@ class AlmacenResource extends Resource
             'create' => Pages\CreateAlmacen::route('/create'),
             'edit' => Pages\EditAlmacen::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
     }
 }

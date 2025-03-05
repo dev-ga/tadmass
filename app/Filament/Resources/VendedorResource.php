@@ -104,4 +104,9 @@ class VendedorResource extends Resource
             'edit' => Pages\EditVendedor::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
+    }
 }

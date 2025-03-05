@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Gasto extends Model
 {
@@ -12,15 +13,14 @@ class Gasto extends Model
 
     //fillable
     protected $fillable = [
-        'nro_gasto',
+        // 'nro_gasto',
         'codigo',
-        'descripcion',
-        'tipo_gasto',
-        'numero_factura',
         'nro_control',
-        'fecha',
         'fecha_factura',
+        'descripcion',
         'proveedor_id',
+        'numero_factura',
+        'fecha',
         'metodo_pago',
         'tasa_bcv',
         'monto_usd',
@@ -29,15 +29,16 @@ class Gasto extends Model
         'total_gasto_bsd',
         'conversion_usd',
         'registrado_por',
+        'observacion'
     ];
 
     /**
-     * Get all of the proveedores for the Gasto
+     * Get all of the proveedores for the Compra
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function proveedores(): HasMany
+    public function proveedor(): BelongsTo
     {
-        return $this->hasMany(Proveedor::class, 'proveedor_id', 'id');
+        return $this->belongsTo(Proveedor::class);
     }
 }

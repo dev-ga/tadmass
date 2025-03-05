@@ -99,4 +99,9 @@ class ProveedorResource extends Resource
             'edit' => Pages\EditProveedor::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
+    }
 }

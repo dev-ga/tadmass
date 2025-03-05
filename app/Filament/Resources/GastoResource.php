@@ -2,16 +2,23 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\GastoResource\Pages;
-use App\Filament\Resources\GastoResource\RelationManagers;
-use App\Models\Gasto;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Gasto;
+use App\Models\Almacen;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Filament\Forms\Form;
+use App\Models\MetodoPago;
 use Filament\Tables\Table;
+use App\Models\Configuracion;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\ToggleButtons;
+use App\Filament\Resources\GastoResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\GastoResource\RelationManagers;
 
 class GastoResource extends Resource
 {
@@ -22,64 +29,280 @@ class GastoResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            // ->schema([
+
+            // Forms\Components\TextInput::make('nro_gasto')
+            //     ->required()
+            //     ->maxLength(255),
+            // Forms\Components\TextInput::make('codigo')
+            //     ->required()
+            //     ->maxLength(255),
+            // Forms\Components\TextInput::make('descripcion')
+            //     ->required()
+            //     ->maxLength(255),
+            // Forms\Components\TextInput::make('tipo_gasto')
+            //     ->required()
+            //     ->maxLength(255),
+            // Forms\Components\TextInput::make('numero_factura')
+            //     ->required()
+            //     ->maxLength(255),
+            // Forms\Components\TextInput::make('nro_control')
+            //     ->required()
+            //     ->maxLength(255),
+            // Forms\Components\TextInput::make('fecha')
+            //     ->required()
+            //     ->maxLength(255),
+            // Forms\Components\TextInput::make('fecha_factura')
+            //     ->required()
+            //     ->maxLength(255),
+            // Forms\Components\TextInput::make('proveedor_id')
+            //     ->numeric(),
+            // Forms\Components\TextInput::make('metodo_pago')
+            //     ->required()
+            //     ->maxLength(255),
+            // Forms\Components\TextInput::make('tasa_bcv')
+            //     ->required()
+            //     ->numeric()
+            //     ->default(0.00),
+            // Forms\Components\TextInput::make('monto_usd')
+            //     ->required()
+            //     ->numeric()
+            //     ->default(0.00),
+            // Forms\Components\TextInput::make('monto_bsd')
+            //     ->required()
+            //     ->numeric()
+            //     ->default(0.00),
+            // Forms\Components\TextInput::make('iva')
+            //     ->required()
+            //     ->numeric()
+            //     ->default(0.00),
+            // Forms\Components\TextInput::make('total_gasto_bsd')
+            //     ->required()
+            //     ->numeric()
+            //     ->default(0.00),
+            // Forms\Components\TextInput::make('conversion_usd')
+            //     ->required()
+            //     ->numeric()
+            //     ->default(0.00),
+            // Forms\Components\TextInput::make('registrado_por')
+            //     ->required()
+            //     ->maxLength(255)
+            //     ->default(0),
+            // ]);
             ->schema([
-                Forms\Components\TextInput::make('nro_gasto')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('codigo')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('descripcion')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('tipo_gasto')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('numero_factura')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('nro_control')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('fecha')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('fecha_factura')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('proveedor_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('metodo_pago')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('tasa_bcv')
-                    ->required()
-                    ->numeric()
-                    ->default(0.00),
-                Forms\Components\TextInput::make('monto_usd')
-                    ->required()
-                    ->numeric()
-                    ->default(0.00),
-                Forms\Components\TextInput::make('monto_bsd')
-                    ->required()
-                    ->numeric()
-                    ->default(0.00),
-                Forms\Components\TextInput::make('iva')
-                    ->required()
-                    ->numeric()
-                    ->default(0.00),
-                Forms\Components\TextInput::make('total_gasto_bsd')
-                    ->required()
-                    ->numeric()
-                    ->default(0.00),
-                Forms\Components\TextInput::make('conversion_usd')
-                    ->required()
-                    ->numeric()
-                    ->default(0.00),
-                Forms\Components\TextInput::make('registrado_por')
-                    ->required()
-                    ->maxLength(255)
-                    ->default(0),
+                Forms\Components\Section::make('INFORMACION DEL GASTOS')
+                    ->description('Formulario de gastos')
+                    ->icon('heroicon-m-arrow-trending-down')
+                    ->schema([
+
+                        Forms\Components\TextInput::make('codigo')
+                            ->label('Codigo de gasto')
+                            ->prefixIcon('heroicon-c-clipboard-document-list')
+                            ->default('G-'.random_int(11111, 999999)),
+                            
+                        Forms\Components\TextInput::make('nro_control')
+                            ->label('Nro. de Control')
+                            ->prefixIcon('heroicon-c-clipboard-document-list')
+                            ->required()
+                            ->rules(['required', 'string', 'max:255'])
+                            ->validationMessages([
+                                'required'  => 'Campo requerido',
+                            ]),
+
+                        Forms\Components\DatePicker::make('fecha_factura')
+                            ->label('Fecha de Factura')
+                            ->prefixIcon('heroicon-m-calendar-days')
+                            ->format('d-m-Y'),
+
+                        Forms\Components\TextInput::make('numero_factura')
+                            ->label('Nro. de Factura')
+                            ->prefixIcon('heroicon-c-clipboard-document-list')
+                            ->rules(['required', 'string', 'max:255'])
+                            ->validationMessages([
+                                'required'  => 'Campo requerido',
+                            ]),
+
+                        Forms\Components\TextInput::make('descripcion')
+                            ->label('Descripción')
+                            ->prefixIcon('heroicon-s-pencil')
+                            ->required()
+                            ->maxLength(255),
+
+                        Forms\Components\Select::make('proveedor_id')
+                            ->prefixIcon('heroicon-m-numbered-list')
+                            ->relationship('proveedor', 'nombre')
+                            ->searchable()
+                            ->preload()
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('rif')
+                                    ->label('Rif')
+                                    ->required(),
+                                Forms\Components\TextInput::make('nombre')
+                                    ->label('Nombre/Razon Social')
+                                    ->required(),
+                            ])
+                            ->required(),
+
+                        Forms\Components\Select::make('forma_pago')
+                            ->label('Forma de Pago')
+                            ->prefixIcon('heroicon-m-numbered-list')
+                            ->required()
+                            ->live()
+                            ->options([
+                                'dolares' => 'Dolares',
+                                'bolivares' => 'Bolivares',
+                            ]),
+
+                        Forms\Components\Select::make('metodo_pago')
+                            ->prefixIcon('heroicon-m-numbered-list')
+                            ->label('Metodo de Pago')
+                            ->required()
+                            ->options(function (Get $get) {
+                                if ($get('forma_pago') == 'dolares') {
+                                    return MetodoPago::where('tipo_moneda', 'usd')->pluck('descripcion', 'id');
+                                }
+
+                                if ($get('forma_pago') == 'bolivares') {
+                                    return MetodoPago::where('tipo_moneda', 'bsd')->pluck('descripcion', 'id');
+                                }
+                            })
+                            ->live(),
+
+                        Forms\Components\TextInput::make('registrado_por')
+                            ->prefixIcon('heroicon-s-shield-check')
+                            ->label('Cargado por:')
+                            ->disabled()
+                            ->dehydrated()
+                            ->default(Auth::user()->name),
+
+                        Forms\Components\Section::make()
+                            ->schema([
+                                Forms\Components\Textarea::make('observacion')
+                                    ->label('Observaciones Relevante'),
+                            ])
+                    ])->columns(2),
+
+                Forms\Components\Section::make('ASOCIADO A:')
+                    ->description('Formulario de gastos')
+                    ->icon('heroicon-m-arrow-trending-down')
+                    ->schema([
+                        Forms\Components\Select::make('almacen_id')
+                            ->prefixIcon('heroicon-m-numbered-list')
+                            ->live()
+                            ->label('Almacenes')
+                            ->options(Almacen::all()->pluck('nombre', 'id')),
+                    ])->columns(1),
+
+                Forms\Components\Section::make('COSTOS:')
+                    ->description('Formulario de gastos')
+                    ->icon('heroicon-m-arrow-trending-down')
+                    ->schema([
+
+                        ToggleButtons::make('feedback')
+                            ->label('Maneja IVA?')
+                            ->boolean()
+                            ->inline()
+                            ->live()
+                            ->hidden(function (Get $get) {
+                                if ($get('forma_pago') == 'bolivares') {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            })
+                            ->default(false)
+                            ->columnSpanFull(),
+
+                        Forms\Components\TextInput::make('tasa_bcv')
+                            ->hidden(function (Get $get) {
+                                if ($get('forma_pago') == 'bolivares') {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            })
+                            ->live()
+                            ->numeric()
+                            ->required(),
+
+                        Forms\Components\TextInput::make('monto_usd')
+                            ->label('Monto en USD($)')
+                            ->prefixIcon('heroicon-s-currency-dollar')
+                            ->numeric()
+                            ->live(onBlur: true)
+                            ->hidden(function (Get $get) {
+                                if ($get('forma_pago') == 'dolares') {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            })
+                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                self::updateTotales($get, $set);
+                            })
+                            ->placeholder('0.00'),
+
+                        Forms\Components\TextInput::make('monto_bsd')
+                            ->label('Monto en BSD(Bs.)')
+                            ->prefixIcon('heroicon-m-credit-card')
+                            ->hidden(function (Get $get) {
+                                if ($get('forma_pago') == 'bolivares') {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            })
+                            ->numeric()
+                            ->placeholder('0.00')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                self::updateTotales($get, $set);
+                            }),
+
+                        Forms\Components\TextInput::make('iva')
+                            ->label('IVA(%)')
+                            ->prefixIcon('heroicon-m-credit-card')
+                            ->hidden(function (Get $get) {
+                                if ($get('feedback') == true) {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            })
+                            ->live()
+                            ->disabled()
+                            ->dehydrated()
+                            ->numeric()
+                            ->default(0.00),
+
+                        Forms\Components\TextInput::make('total_gasto_bsd')
+                            ->label('Total Gasto en Bolivares(Bs.)')
+                            ->prefixIcon('heroicon-m-credit-card')
+                            ->live()
+                            ->disabled()
+                            ->dehydrated()
+                            ->numeric()
+                            ->default(0.00)
+                            ->placeholder('0.00'),
+
+                        Forms\Components\TextInput::make('conversion_a_usd')
+                            ->label('Total Gasto en Dolares($)')
+                            ->prefixIcon('heroicon-m-credit-card')
+                            ->live()
+                            ->disabled()
+                            ->dehydrated()
+                            ->numeric()
+                            ->placeholder('0.00'),
+
+                    ])
+                    ->hidden(function (Get $get) {
+                        if ($get('sucursal_id')  || $get('almacen_id') != null) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    })
+                    ->columns(2),
             ]);
     }
 
@@ -164,5 +387,31 @@ class GastoResource extends Resource
             'create' => Pages\CreateGasto::route('/create'),
             'edit' => Pages\EditGasto::route('/{record}/edit'),
         ];
+    }
+
+    public static function updateTotales(Get $get, Set $set): void
+    {
+        $parametro_iva = Configuracion::first()->iva;
+
+        if ($get('feedback') == true) {
+            $iva = $get('monto_bsd') * $parametro_iva;
+            $set('iva', round($iva, 2));
+            $set('total_gasto_bsd',  round(($get('monto_bsd') + $iva), 2));
+            $set('conversion_a_usd', round($get('total_gasto_bsd') / $get('tasa_bcv'), 2));
+        }
+
+        if ($get('feedback') == false && $get('forma_pago') == 'dolares') {
+            $set('conversion_a_usd', round($get('monto_usd'), 2));
+        }
+
+        if ($get('feedback') == false && $get('forma_pago') == 'bolivares') {
+            $set('total_gasto_bsd',  round($get('monto_bsd'), 2));
+            $set('conversion_a_usd', round($get('monto_bsd') / $get('tasa_bcv'), 2));
+        }
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Contabilidad';
     }
 }

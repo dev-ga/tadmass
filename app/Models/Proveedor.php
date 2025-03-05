@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Proveedor extends Model
@@ -20,12 +21,12 @@ class Proveedor extends Model
     ];
 
     /**
-     * Get the gsto that owns the Proveedor
+     * Get the gastos that owns the Proveedor
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function gasto(): BelongsTo
+    public function gastos(): HasMany
     {
-        return $this->belongsTo(Gasto::class, 'proveedor_id', 'id');
+        return $this->hasMany(Gasto::class);
     }
 }

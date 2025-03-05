@@ -17,7 +17,7 @@ class MovimientoInventarioResource extends Resource
 {
     protected static ?string $model = MovimientoInventario::class;
 
-    protected static ?string $navigationIcon = 'heroicon-s-shopping-cart';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
@@ -60,5 +60,10 @@ class MovimientoInventarioResource extends Resource
             'create' => Pages\CreateMovimientoInventario::route('/create'),
             'edit' => Pages\EditMovimientoInventario::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
     }
 }

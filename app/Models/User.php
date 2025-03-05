@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Filament\Panel;
 use Filament\Models\Contracts\HasName;
 use Filament\Models\Contracts\HasAvatar;
@@ -11,10 +13,14 @@ use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+use Spatie\Permission\Traits\HasRoles;
+
 class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+    use HasRoles;
+    use HasPanelShield;
 
     /**
      * The attributes that are mass assignable.
@@ -58,13 +64,13 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
         // return str_ends_with($this->email, '@piedyadmin.com') && $this->hasVerifiedEmail();
         // return $this->hasVerifiedEmail();
 
-        if ($panel->getId() === 'admin') {
-            return str_contains($this->email, 'admin@tadmass.com') && $this->hasVerifiedEmail();
-        } else if ($panel->getId() === 'employee') {
-            return str_contains($this->email, 'employee@tadmass.com') && $this->hasVerifiedEmail();
-        }
+        // if ($panel->getId() === 'admin') {
+        //     return str_contains($this->email, 'admin@tadmass.com') && $this->hasVerifiedEmail();
+        // } else if ($panel->getId() === 'employee') {
+        //     return str_contains($this->email, 'employee@tadmass.com') && $this->hasVerifiedEmail();
+        // }
 
-        return false;
+        return true;
     }
 
     public function getFilamentName(): string

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Producto extends Model
 {
@@ -50,6 +51,16 @@ class Producto extends Model
     public function almacen(): HasOne
     {
         return $this->hasOne(User::class, 'producto_id', 'id');
+    }
+
+    /**
+     * Get the inventario that owns the Producto
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function inventario(): BelongsTo
+    {
+        return $this->belongsTo(Inventario::class, 'id', 'producto_id');
     }
 
     /**

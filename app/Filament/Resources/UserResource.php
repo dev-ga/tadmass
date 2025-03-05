@@ -35,6 +35,11 @@ class UserResource extends Resource
                     ->password()
                     ->required()
                     ->maxLength(255),
+            Forms\Components\Select::make('roles')
+                ->relationship('roles', 'name')
+                ->multiple()
+                ->preload()
+                ->searchable(),
             ]);
     }
 
@@ -85,5 +90,10 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Seguridad';
     }
 }

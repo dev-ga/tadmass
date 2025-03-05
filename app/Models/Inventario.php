@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -24,13 +25,13 @@ class Inventario extends Model
     ];
 
     /**
-     * Get the producto that owns the Inventario
+     * Get the producto associated with the Inventario
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function producto(): BelongsTo
+    public function producto(): HasOne
     {
-        return $this->belongsTo(User::class, 'producto_id', 'id');
+        return $this->hasOne(Producto::class, 'id', 'producto_id');
     }
 
     /**
