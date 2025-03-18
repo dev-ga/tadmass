@@ -2,16 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\InventarioResource\Pages;
-use App\Filament\Resources\InventarioResource\RelationManagers;
-use App\Models\Inventario;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
+use App\Models\Inventario;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\InventarioResource\Pages;
+use App\Filament\Resources\InventarioResource\RelationManagers;
+use App\Filament\Resources\InventarioResource\RelationManagers\MovimientoInventariosRelationManager;
 
 class InventarioResource extends Resource
 {
@@ -23,29 +25,52 @@ class InventarioResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('almacen_id')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('producto_id')
-                    ->relationship('producto', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('categoria_id')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('existencia')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('precio_venta_mayor')
-                    ->required()
-                    ->numeric()
-                    ->default(0.00),
-                Forms\Components\TextInput::make('precio_venta_detal')
-                    ->required()
-                    ->numeric()
-                    ->default(0.00),
-                Forms\Components\TextInput::make('registrado_por')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Section::make('INVENTARIO')
+                    ->description('Formulario de registro/actualizacion del inventario. Campos Requeridos(*)')
+                    ->icon('heroicon-c-building-library')
+                    ->schema([
+
+                            Forms\Components\Select::make('almacen_id')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->relationship('almacen', 'nombre')
+                                ->required(),
+                            //producto
+                            Forms\Components\Select::make('producto_id')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->relationship('producto', 'nombre')
+                                ->required(),
+                       
+                            Forms\Components\TextInput::make('categoria_id')
+                                ->label('Categoria')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('existencia')
+                                ->label('Existencia')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->required()
+                                ->numeric(),
+                            Forms\Components\TextInput::make('precio_venta_mayor')
+                                ->label('Precio Venta Mayor')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->hint('Separador decimal con punto(.)' . ' Ejemplo: 1235.67')
+                                ->required()
+                                ->numeric(),
+                            Forms\Components\TextInput::make('precio_venta')
+                                ->label('Precio Venta Detal')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->hint('Separador decimal con punto(.)' . ' Ejemplo: 1235.67')
+                                ->required()
+                                ->numeric(),
+                            Forms\Components\TextInput::make('registrado_por')
+                                ->label('Registrado Por')
+                                ->prefixIcon('heroicon-s-shield-check')
+                                ->default(Auth::user()->name)
+                                ->disabled()
+                                ->dehydrated()
+
+
+                    ])->columns(2),
             ]);
     }
 
@@ -53,11 +78,11 @@ class InventarioResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('almacen_id')
+                Tables\Columns\TextColumn::make('almacen.nombre')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('producto.name')
+                Tables\Columns\TextColumn::make('producto.nombre')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('categoria_id')
+                Tables\Columns\TextColumn::make('categoria.nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('existencia')
                     ->numeric()
@@ -65,7 +90,7 @@ class InventarioResource extends Resource
                 Tables\Columns\TextColumn::make('precio_venta_mayor')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('precio_venta_detal')
+                Tables\Columns\TextColumn::make('precio_venta')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('registrado_por')
@@ -95,7 +120,7 @@ class InventarioResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            MovimientoInventariosRelationManager::class
         ];
     }
 
@@ -106,5 +131,10 @@ class InventarioResource extends Resource
             'create' => Pages\CreateInventario::route('/create'),
             'edit' => Pages\EditInventario::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
     }
 }

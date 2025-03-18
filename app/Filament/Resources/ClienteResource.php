@@ -2,16 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ClienteResource\Pages;
-use App\Filament\Resources\ClienteResource\RelationManagers;
-use App\Models\Cliente;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Cliente;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\ClienteResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ClienteResource\RelationManagers;
+use App\Filament\Resources\ClienteResource\RelationManagers\VentasRelationManager;
 
 class ClienteResource extends Resource
 {
@@ -23,26 +24,44 @@ class ClienteResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('ci_rif')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('telefono')
-                    ->tel()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('direccion')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('registrado_por')
-                    ->required()
-                    ->maxLength(255),
+            Forms\Components\Section::make('CLIENTES')
+                ->description('Formulario de registro para clientes. Campos Requeridos(*)')
+                ->icon('heroicon-s-user-group')
+                ->schema([
+
+                    Forms\Components\TextInput::make('nombre')
+                    ->prefixIcon('heroicon-c-clipboard-document-list')
+                    ->label('Nombre y Apellidos o Razón Social')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('ci_rif')
+                    ->prefixIcon('heroicon-c-clipboard-document-list')
+                        ->label('CI o RIF')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('email')
+                        ->label('Email')
+                        ->email()
+                        ->prefixIcon('heroicon-o-at-symbol')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('telefono')
+                    ->prefixIcon('heroicon-m-phone')
+                        ->label('Nro. de Telefono')
+                        ->tel()
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('direccion')
+                    ->prefixIcon('heroicon-c-clipboard-document-list')
+                        ->label('Dirección')    
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('registrado_por')
+                    ->prefixIcon('heroicon-s-shield-check')
+                        ->required()
+                        ->maxLength(255),
+
+            ])->columns(3),
             ]);
     }
 
@@ -87,7 +106,7 @@ class ClienteResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            VentasRelationManager::class
         ];
     }
 
@@ -98,5 +117,10 @@ class ClienteResource extends Resource
             'create' => Pages\CreateCliente::route('/create'),
             'edit' => Pages\EditCliente::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
     }
 }

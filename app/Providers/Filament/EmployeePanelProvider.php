@@ -57,6 +57,9 @@ class EmployeePanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+            ->plugins([
+                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
+            ])
             ->renderHook(PanelsRenderHook::TOPBAR_END, function () {
                 return view('topbar-end-bcv');
             })

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -24,13 +25,13 @@ class Inventario extends Model
     ];
 
     /**
-     * Get the producto that owns the Inventario
+     * Get the producto associated with the Inventario
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function producto(): BelongsTo
+    public function producto(): HasOne
     {
-        return $this->belongsTo(User::class, 'producto_id', 'id');
+        return $this->hasOne(Producto::class, 'id', 'producto_id');
     }
 
     /**
@@ -38,8 +39,28 @@ class Inventario extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function movimiento_inventarios(): HasMany
+    public function movimientoInventarios(): HasMany
     {
         return $this->hasMany(MovimientoInventario::class, 'inventario_id', 'id');
+    }
+
+    /**
+     * Get the user associated with the Inventario
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function almacen(): HasOne
+    {
+        return $this->hasOne(Almacen::class, 'id', 'almacen_id');
+    }
+
+    /**
+     * Get the user associated with the Inventario
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function categoria(): HasOne
+    {
+        return $this->hasOne(Categoria::class, 'id', 'almacen_id');
     }
 }

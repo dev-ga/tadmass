@@ -2,16 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CategoriaResource\Pages;
-use App\Filament\Resources\CategoriaResource\RelationManagers;
-use App\Models\Categoria;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
+use App\Models\Categoria;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\CategoriaResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\CategoriaResource\RelationManagers;
+
+use Filament\Forms\Set;
+use Illuminate\Support\Str;
 
 class CategoriaResource extends Resource
 {
@@ -23,14 +27,30 @@ class CategoriaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('slug')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('registrado_por')
-                    ->required()
-                    ->maxLength(255),
+            Forms\Components\Section::make('CATEGORIAS')
+                ->description('Formulario de registro para categorias de productos. Campos Requeridos(*)')
+                ->icon('heroicon-s-swatch')
+                ->schema([
+                    Forms\Components\TextInput::make('nombre')
+                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                        ->label('Nombre de categoria')
+                        ->required()
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state)))
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('slug')
+                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                        ->label('Slug de categoria')
+                        ->disabled()
+                        ->dehydrated()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('registrado_por')
+                        ->prefixIcon('heroicon-s-shield-check')
+                        ->default(Auth::user()->name)
+                        ->disabled()
+                        ->dehydrated()
+                        ->maxLength(255),
+                ])->columns(3),
             ]);
     }
 
@@ -80,5 +100,10 @@ class CategoriaResource extends Resource
             'create' => Pages\CreateCategoria::route('/create'),
             'edit' => Pages\EditCategoria::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
     }
 }

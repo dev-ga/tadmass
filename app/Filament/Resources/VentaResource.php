@@ -139,4 +139,9 @@ class VentaResource extends Resource
             'edit' => Pages\EditVenta::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Contabilidad';
+    }
 }

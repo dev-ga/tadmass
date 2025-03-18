@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class MovimientoInventario extends Model
 {
     //table
-    protected $table = 'movimiento_inventario';
+    protected $table = 'movimiento_inventarios';
 
     //fillable
     protected $fillable = [

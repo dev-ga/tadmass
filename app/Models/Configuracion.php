@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Configuracion extends Model
 {
     //
-    protected $table = 'configuracion';
+    protected $table = 'configuracions';
 
     protected $fillable = [
         'iva',
