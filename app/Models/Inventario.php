@@ -39,8 +39,28 @@ class Inventario extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function movimiento_inventarios(): HasMany
+    public function movimientoInventarios(): HasMany
     {
         return $this->hasMany(MovimientoInventario::class, 'inventario_id', 'id');
+    }
+
+    /**
+     * Get the user associated with the Inventario
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function almacen(): HasOne
+    {
+        return $this->hasOne(Almacen::class, 'id', 'almacen_id');
+    }
+
+    /**
+     * Get the user associated with the Inventario
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function categoria(): HasOne
+    {
+        return $this->hasOne(Categoria::class, 'id', 'almacen_id');
     }
 }

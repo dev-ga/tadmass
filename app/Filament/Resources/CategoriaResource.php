@@ -29,7 +29,7 @@ class CategoriaResource extends Resource
             ->schema([
             Forms\Components\Section::make('CATEGORIAS')
                 ->description('Formulario de registro para categorias de productos. Campos Requeridos(*)')
-                ->icon('heroicon-c-building-library')
+                ->icon('heroicon-s-swatch')
                 ->schema([
                     Forms\Components\TextInput::make('nombre')
                         ->prefixIcon('heroicon-c-clipboard-document-list')

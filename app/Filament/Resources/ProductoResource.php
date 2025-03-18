@@ -4,8 +4,10 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\Almacen;
 use App\Models\Producto;
 use Filament\Forms\Form;
+use App\Models\Categoria;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +31,7 @@ class ProductoResource extends Resource
             ->schema([
             Forms\Components\Section::make('PRODUCTOS')
                 ->description('Formulario para el registro de los Articulos/Productos. Campos Requeridos(*)')
-                ->icon('heroicon-c-building-library')
+                ->icon('heroicon-c-square-3-stack-3d')
                 ->schema([
                     //Imagen del producto
                     Section::make()
@@ -62,11 +64,13 @@ class ProductoResource extends Resource
                         ->prefixIcon('heroicon-c-clipboard-document-list')
                         ->required()
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('categoria_id')
+                        //select categorias
+                    Forms\Components\Select::make('categoria_id')
                         ->label('Categoria')
                         ->prefixIcon('heroicon-c-clipboard-document-list')
                         ->required()
-                        ->maxLength(255),
+                        ->options(Categoria::all()->pluck('nombre', 'id'))
+                        ->searchable(),
 
                     Forms\Components\TextInput::make('marca')
                     ->prefixIcon('heroicon-c-clipboard-document-list')
@@ -78,11 +82,12 @@ class ProductoResource extends Resource
                         ->label('Modelo')
                         ->required()
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('fecha_vencimiento')
-                    ->prefixIcon('heroicon-c-calendar-days')
+                        //fecha de vencimiento
+                        Forms\Components\Datepicker::make('fecha_vencimiento')
                         ->label('Fecha de Vencimiento')
-                        ->required()
-                        ->maxLength(255),
+                        ->prefixIcon('heroicon-c-calendar-days')
+                        ->required(),
+                    
                     Forms\Components\TextInput::make('unidad_medida')
                     ->prefixIcon('heroicon-c-clipboard-document-list')
                         ->label('Unidad de Medida')
@@ -98,37 +103,15 @@ class ProductoResource extends Resource
                     ->prefixIcon('heroicon-c-clipboard-document-list')
                         ->label('Precio de Compra')
                         ->hint('Punto(.) para decimales, Ejemplo: 1345.78')
-                        ->required()
-                        ->numeric(),
-                    Forms\Components\TextInput::make('precio_venta_detal')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Precio de Venta Mayor')
-                        ->hint('Punto(.) para decimales, Ejemplo: 1345.78')
-                        ->required()
-                        ->numeric(),
-                    Forms\Components\TextInput::make('precio_mayor')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
-                    ->label('Precio de Compra Mayor')
-                    ->hint('Punto(.) para decimales, Ejemplo: 1345.78')   
-                        ->required()
-                        ->numeric(),
-                    Forms\Components\TextInput::make('precio_compra_mayor')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Precio de Venta Mayor')
-                        ->hint('Punto(.) para decimales, Ejemplo: 1345.78')
-                        ->required()
-                        ->numeric(),
+                        ->numeric(),   
+                        
                     Forms\Components\TextInput::make('precio_venta_mayor')
                     ->prefixIcon('heroicon-c-clipboard-document-list')
                         ->label('Precio de Venta Mayor')
                         ->hint('Punto(.) para decimales, Ejemplo: 1345.78')
-                        ->required()
+                        
                         ->numeric(),
-                    Forms\Components\TextInput::make('status')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Estatus')
-                        ->required()
-                        ->maxLength(255),
+                    
                     Forms\Components\TextInput::make('registrado_por')
                         ->label('Registrado Por')
                         ->prefixIcon('heroicon-s-shield-check')
@@ -143,11 +126,12 @@ class ProductoResource extends Resource
                 ->icon('heroicon-m-list-bullet')
                 ->schema([
 
-                    Forms\Components\TextInput::make('almacen_id')
+                    Forms\Components\Select::make('almacen_id')
                         ->label('Almacen')
                         ->prefixIcon('heroicon-c-clipboard-document-list')
                         ->required()
-                        ->maxLength(255),
+                        ->options(Almacen::all()->pluck('nombre', 'id'))
+                        ->searchable(),
                     Forms\Components\TextInput::make('existencia')
                         ->label('Existencia')
                         ->prefixIcon('heroicon-c-clipboard-document-list')

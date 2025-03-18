@@ -17,15 +17,15 @@ class MovimientoInventarioResource extends Resource
 {
     protected static ?string $model = MovimientoInventario::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-c-shopping-cart';
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
-    }
+    // public static function form(Form $form): Form
+    // {
+    //     return $form
+    //         ->schema([
+    //             //
+    //         ]);
+    // }
 
     public static function table(Table $table): Table
     {
