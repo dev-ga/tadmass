@@ -21,84 +21,94 @@ class InventarioResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-s-table-cells';
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('INVENTARIO')
-                    ->description('Formulario de registro/actualizacion del inventario. Campos Requeridos(*)')
-                    ->icon('heroicon-c-building-library')
-                    ->schema([
+    // public static function form(Form $form): Form
+    // {
+    //     return $form
+    //         ->schema([
+    //             Forms\Components\Section::make('INVENTARIO')
+    //                 ->description('Formulario de registro/actualizacion del inventario. Campos Requeridos(*)')
+    //                 ->icon('heroicon-c-building-library')
+    //                 ->schema([
 
-                            Forms\Components\Select::make('almacen_id')
-                                ->prefixIcon('heroicon-c-clipboard-document-list')
-                                ->relationship('almacen', 'nombre')
-                                ->required(),
-                            //producto
-                            Forms\Components\Select::make('producto_id')
-                                ->prefixIcon('heroicon-c-clipboard-document-list')
-                                ->relationship('producto', 'nombre')
-                                ->required(),
+    //                         Forms\Components\Select::make('almacen_id')
+    //                             ->prefixIcon('heroicon-c-clipboard-document-list')
+    //                             ->relationship('almacen', 'nombre')
+    //                             ->required(),
+    //                         //producto
+    //                         Forms\Components\Select::make('producto_id')
+    //                             ->prefixIcon('heroicon-c-clipboard-document-list')
+    //                             ->relationship('producto', 'nombre')
+    //                             ->required(),
                        
-                            Forms\Components\TextInput::make('categoria_id')
-                                ->label('Categoria')
-                                ->prefixIcon('heroicon-c-clipboard-document-list')
-                                ->required()
-                                ->maxLength(255),
-                            Forms\Components\TextInput::make('existencia')
-                                ->label('Existencia')
-                                ->prefixIcon('heroicon-c-clipboard-document-list')
-                                ->required()
-                                ->numeric(),
-                            Forms\Components\TextInput::make('precio_venta_mayor')
-                                ->label('Precio Venta Mayor')
-                                ->prefixIcon('heroicon-c-clipboard-document-list')
-                                ->hint('Separador decimal con punto(.)' . ' Ejemplo: 1235.67')
-                                ->required()
-                                ->numeric(),
-                            Forms\Components\TextInput::make('precio_venta')
-                                ->label('Precio Venta Detal')
-                                ->prefixIcon('heroicon-c-clipboard-document-list')
-                                ->hint('Separador decimal con punto(.)' . ' Ejemplo: 1235.67')
-                                ->required()
-                                ->numeric(),
-                            Forms\Components\TextInput::make('registrado_por')
-                                ->label('Registrado Por')
-                                ->prefixIcon('heroicon-s-shield-check')
-                                ->default(Auth::user()->name)
-                                ->disabled()
-                                ->dehydrated()
+    //                         Forms\Components\TextInput::make('categoria_id')
+    //                             ->label('Categoria')
+    //                             ->prefixIcon('heroicon-c-clipboard-document-list')
+    //                             ->required()
+    //                             ->maxLength(255),
+    //                         Forms\Components\TextInput::make('existencia')
+    //                             ->label('Existencia')
+    //                             ->prefixIcon('heroicon-c-clipboard-document-list')
+    //                             ->required()
+    //                             ->numeric(),
+    //                         Forms\Components\TextInput::make('precio_venta_mayor')
+    //                             ->label('Precio Venta Mayor')
+    //                             ->prefixIcon('heroicon-c-clipboard-document-list')
+    //                             ->hint('Separador decimal con punto(.)' . ' Ejemplo: 1235.67')
+    //                             ->required()
+    //                             ->numeric(),
+    //                         Forms\Components\TextInput::make('precio_venta')
+    //                             ->label('Precio Venta Detal')
+    //                             ->prefixIcon('heroicon-c-clipboard-document-list')
+    //                             ->hint('Separador decimal con punto(.)' . ' Ejemplo: 1235.67')
+    //                             ->required()
+    //                             ->numeric(),
+    //                         Forms\Components\TextInput::make('registrado_por')
+    //                             ->label('Registrado Por')
+    //                             ->prefixIcon('heroicon-s-shield-check')
+    //                             ->default(Auth::user()->name)
+    //                             ->disabled()
+    //                             ->dehydrated()
 
 
-                    ])->columns(2),
-            ]);
-    }
+    //                 ])->columns(2),
+    //         ]);
+    // }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('almacen.nombre')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('codigo')
+                ->badge()
+                ->searchable(),
                 Tables\Columns\TextColumn::make('producto.nombre')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('categoria.nombre')
+                Tables\Columns\TextColumn::make('almacen.nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('existencia')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('precio_venta_mayor')
+                    ->badge()
+                    ->color('success')
+                    ->icon('heroicon-s-currency-dollar')
+                    ->label('Precio Venta Mayor($)')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('precio_venta')
+                Tables\Columns\TextColumn::make('precio_venta_detal')
+                    ->badge()
+                    ->color('success')
+                    ->icon('heroicon-s-currency-dollar')
+                    ->label('Precio Venta Detal($)')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('registrado_por')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Fecha de Registro')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()

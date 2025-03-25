@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('almacens', function (Blueprint $table) {
+        Schema::create('pedido_detalles', function (Blueprint $table) {
             $table->id();
-            $table->string('codigo')->unique();
-            $table->string('nombre');
-            $table->string('direccion');
-            $table->string('telefono');
-            $table->string('responsable_almacen')->nullable();
-            $table->string('registrado_por');
+            $table->integer('pedido_id');
+            $table->integer('producto_id');
+            $table->integer('cantidad');
+            $table->decimal('precio_unitario', 8, 2);
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('almacens');
+        Schema::dropIfExists('pedido_detalles');
     }
 };

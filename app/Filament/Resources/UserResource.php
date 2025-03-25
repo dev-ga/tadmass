@@ -23,23 +23,31 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->required()
-                    ->maxLength(255),
-            Forms\Components\Select::make('roles')
-                ->relationship('roles', 'name')
-                ->multiple()
-                ->preload()
-                ->searchable(),
+   
+            Forms\Components\Section::make('USUARIOS TADMASS')
+                ->description('Formulario de registro de usuarios. Campos Requeridos(*)')
+                ->icon('heroicon-s-user-circle')
+                ->schema([
+
+                    Forms\Components\TextInput::make('name')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('email')
+                        ->email()
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\DateTimePicker::make('email_verified_at'),
+                    Forms\Components\TextInput::make('password')
+                        ->password()
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\Select::make('roles')
+                        ->relationship('roles', 'name')
+                        ->multiple()
+                        ->preload()
+                        ->searchable(),
+
+                ])->columns(2),
             ]);
     }
 

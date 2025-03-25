@@ -18,6 +18,7 @@ class Vendedor extends Model
         'direccion',
         'tipo',
         'registrado_por',
+        'codigo'
     ];
 
     /**

@@ -8,6 +8,8 @@ use App\Models\Cliente;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ClienteResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -24,18 +26,33 @@ class ClienteResource extends Resource
     {
         return $form
             ->schema([
-            Forms\Components\Section::make('CLIENTES')
+                Forms\Components\Section::make('CLIENTES')
                 ->description('Formulario de registro para clientes. Campos Requeridos(*)')
                 ->icon('heroicon-s-user-group')
                 ->schema([
 
+                    Grid::make()
+                        ->schema([
+                            Forms\Components\TextInput::make('codigo')
+                                ->label('Codigo')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->required()
+                                ->default('TADMASS-CLI-' . rand(111111, 999999))
+                                ->disabled()
+                                ->dehydrated()
+                                ->unique()
+                                ->dehydrated()
+                                ->maxLength(255),
+
+                        ])->columns(4),
+
                     Forms\Components\TextInput::make('nombre')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
-                    ->label('Nombre y Apellidos o Razón Social')
+                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                        ->label('Nombre y Apellidos o Razón Social')
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('ci_rif')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
+                        ->prefixIcon('heroicon-c-clipboard-document-list')
                         ->label('CI o RIF')
                         ->required()
                         ->maxLength(255),
@@ -46,22 +63,24 @@ class ClienteResource extends Resource
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('telefono')
-                    ->prefixIcon('heroicon-m-phone')
+                        ->prefixIcon('heroicon-m-phone')
                         ->label('Nro. de Telefono')
                         ->tel()
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('direccion')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
+                        ->prefixIcon('heroicon-c-clipboard-document-list')
                         ->label('Dirección')    
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('registrado_por')
-                    ->prefixIcon('heroicon-s-shield-check')
-                        ->required()
+                        ->prefixIcon('heroicon-s-shield-check')
+                        ->default(Auth::user()->name)
+                        ->disabled()
+                        ->dehydrated()
                         ->maxLength(255),
 
-            ])->columns(3),
+                ])->columns(3),
             ]);
     }
 
@@ -69,6 +88,8 @@ class ClienteResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('codigo')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('ci_rif')

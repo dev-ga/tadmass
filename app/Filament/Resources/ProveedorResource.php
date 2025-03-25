@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use App\Models\Proveedor;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ProveedorResource\Pages;
@@ -28,6 +29,20 @@ class ProveedorResource extends Resource
                 ->description('Formulario de registro para proveedores. Campos Requeridos(*)')
                 ->icon('heroicon-s-truck')
                 ->schema([
+                    Grid::make()
+                        ->schema([
+                            Forms\Components\TextInput::make('codigo')
+                                ->label('Codigo')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->required()
+                                ->default('TADMASS-P-' . rand(111111, 999999))
+                                ->disabled()
+                                ->dehydrated()
+                                ->unique()
+                                ->dehydrated()
+                                ->maxLength(255),
+
+                        ])->columns(4),
                     Forms\Components\TextInput::make('nombre')
                         ->required()
                         ->maxLength(255),
@@ -60,6 +75,9 @@ class ProveedorResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('codigo')
+                    ->badge()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('ci_rif')

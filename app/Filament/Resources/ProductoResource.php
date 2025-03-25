@@ -5,16 +5,20 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Almacen;
+use Filament\Forms\Get;
 use App\Models\Producto;
 use Filament\Forms\Form;
 use App\Models\Categoria;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Radio;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\ToggleButtons;
 use App\Filament\Resources\ProductoResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProductoResource\RelationManagers;
@@ -45,82 +49,141 @@ class ProductoResource extends Resource
                                     '1:1',
                                 ]),
                         ])->columns(2),
-                    Forms\Components\TextInput::make('codigo')
-                        ->label('Codigo de Registro')
-                        ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->required()
-                        ->default('PRO-'.rand(111111, 999999))
-                        ->disabled()
-                        ->dehydrated()
-                        ->maxLength(255),
-                        
-                    Forms\Components\TextInput::make('nombre')
-                        ->label('Nombre')
-                        ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->required()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('descripcion')
-                        ->label('Descripcion')
-                        ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->required()
-                        ->maxLength(255),
-                        //select categorias
-                    Forms\Components\Select::make('categoria_id')
-                        ->label('Categoria')
-                        ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->required()
-                        ->options(Categoria::all()->pluck('nombre', 'id'))
-                        ->searchable(),
+                    
+                    Section::make()
+                        ->schema([
+                            ToggleButtons::make('feedback')
+                            ->label('Tipo de venta?')
+                            ->boolean()
+                            ->inline()
+                            ->inlineLabel(false)
+                            ->options([
+                                'mayor' => 'Mayor',
+                                'detal' => 'Detal',
+                            ]),
+                            
+                        ])
+                        ->afterStateUpdated(function (Get $get, $set) {
+                            if ($get('feedback') == 'mayor') {
+                                $set('codigo', 'TADMASS-M-' . rand(111111, 999999));
+                                $set('unidad_medida', 'bulto');
+                            }
+                            if ($get('feedback') == 'detal') {
+                                $set('codigo', 'TADMASS-D-' . rand(111111, 999999));
+                                $set('unidad_medida', 'unidad');
+                            }
+                        })
+                        ->live(),
 
-                    Forms\Components\TextInput::make('marca')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Marca')
-                        ->required()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('modelo')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Modelo')
-                        ->required()
-                        ->maxLength(255),
-                        //fecha de vencimiento
-                        Forms\Components\Datepicker::make('fecha_vencimiento')
-                        ->label('Fecha de Vencimiento')
-                        ->prefixIcon('heroicon-c-calendar-days')
-                        ->required(),
-                    
-                    Forms\Components\TextInput::make('unidad_medida')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Unidad de Medida')
-                        ->required()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('precio_detal')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Precio de Venta')
-                        ->hint('Punto(.) para decimales, Ejemplo: 1345.78')
-                        ->required()
-                        ->numeric(),
-                    Forms\Components\TextInput::make('precio_compra_detal')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Precio de Compra')
-                        ->hint('Punto(.) para decimales, Ejemplo: 1345.78')
-                        ->numeric(),   
-                        
-                    Forms\Components\TextInput::make('precio_venta_mayor')
-                    ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Precio de Venta Mayor')
-                        ->hint('Punto(.) para decimales, Ejemplo: 1345.78')
-                        
-                        ->numeric(),
-                    
-                    Forms\Components\TextInput::make('registrado_por')
-                        ->label('Registrado Por')
-                        ->prefixIcon('heroicon-s-shield-check')
-                        ->default(Auth::user()->name)
-                        ->disabled()
-                        ->dehydrated()
-                        ->maxLength(255),
+                    Section::make()
+                        ->schema([
+                            Forms\Components\TextInput::make('codigo')
+                                ->label('Codigo de Registro')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->required()
+                                ->live()
+                                ->disabled()
+                                ->dehydrated()
+                                ->maxLength(255),
+
+                            Forms\Components\TextInput::make('nombre')
+                                ->label('Nombre')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('descripcion')
+                                ->label('Descripcion')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->required()
+                                ->maxLength(255),
+                            //select categorias
+                            Forms\Components\Select::make('categoria_id')
+                                ->label('Categoria')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->required()
+                                ->options(Categoria::all()->pluck('nombre', 'id'))
+                                ->searchable(),
+
+                            Forms\Components\TextInput::make('marca')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->label('Marca')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('modelo')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->label('Modelo')
+                                ->required()
+                                ->maxLength(255),
+                            //fecha de vencimiento
+                            Forms\Components\Datepicker::make('fecha_vencimiento')
+                                ->label('Fecha de Vencimiento')
+                                ->prefixIcon('heroicon-c-calendar-days')
+                                ->minDate(now()->addDay(1)),
+
+                            Forms\Components\TextInput::make('unidad_medida')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->label('Unidad de Medida')
+                                ->disabled()
+                                ->dehydrated()
+                                ->maxLength(255),
+                                
+                            //Vental Detal
+                            //-------------------------------------------------------
+                            Forms\Components\TextInput::make('precio_venta_detal')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->label('Precio Venta(Detal)')
+                                ->hint('Separador decimal(.)')
+                                ->hidden(function (Get $get) {
+                                    return $get('feedback') == 'mayor';
+                                })
+                                ->numeric(),
+                            Forms\Components\TextInput::make('precio_compra_detal')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->label('Precio Compra(Detal)')
+                                ->hint('Separador decimal(.)')
+                                ->hidden(function (Get $get) {
+                                    return $get('feedback') == 'mayor';
+                                })
+                                ->numeric(),
+                            //-------------------------------------------------------
+
+
+                            //Vental Mayor
+                            //-------------------------------------------------------
+                            Forms\Components\TextInput::make('precio_venta_mayor')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->label('Precio Venta(Mayor)')
+                                ->hint('Separador decimal(.)')
+                                ->hidden(function (Get $get) {
+                                    return $get('feedback') == 'detal';
+                                })
+                                ->numeric(),
+                            Forms\Components\TextInput::make('precio_compra_mayor')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->label('Precio Compra(Mayor)')
+                                ->hint('Separador decimal(.)')
+                                ->hidden(function (Get $get) {
+                                    return $get('feedback') == 'detal';
+                                })
+                                ->numeric(),
+                            //-------------------------------------------------------
+
+                            Forms\Components\TextInput::make('registrado_por')
+                                ->label('Registrado Por')
+                                ->prefixIcon('heroicon-s-shield-check')
+                                ->default(Auth::user()->name)
+                                ->disabled()
+                                ->dehydrated()
+                                ->maxLength(255),
+                                    
+                        ])
+                        ->hidden(function (Get $get) {
+                            return $get('feedback') == false;
+                        })
+                        ->columns(3),
 
                 ])->columns(2),
+                
             Section::make('ENTRADA DE INVENTARIO')
                 ->description('Informacion para el registro de la Entrada de Inventario. Campos Requeridos(*)')
                 ->icon('heroicon-m-list-bullet')
@@ -143,7 +206,11 @@ class ProductoResource extends Resource
                         ->default(Auth::user()->name)
                         ->disabled()
                         ->dehydrated()
-                ])->columns(3),
+                ])
+                ->hidden(function (Get $get) {
+                    return $get('feedback') == false;
+                })
+                ->columns(3),
             ]);
     }
 
@@ -152,17 +219,17 @@ class ProductoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
+                    ->badge()   
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('descripcion')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('categoria_id')
+                Tables\Columns\TextColumn::make('categoria.nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('imagen')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('exitencia_real')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('marca')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('modelo')
@@ -171,32 +238,26 @@ class ProductoResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('unidad_medida')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('precio_detal')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('precio_compra_detal')
                     ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('precio_venta_detal')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('precio_mayor')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('precio_venta')
+                    ->badge()
+                    ->color('success')
+                    ->icon('heroicon-o-currency-dollar')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('precio_compra_mayor')
                     ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('precio_venta_mayor')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('registrado_por')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()

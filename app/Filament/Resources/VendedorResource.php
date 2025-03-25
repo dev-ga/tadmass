@@ -8,7 +8,9 @@ use App\Models\Vendedor;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\VendedorResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -28,6 +30,20 @@ class VendedorResource extends Resource
                 ->description('Formulario de registro para vendedores. Campos Requeridos(*)')
                 ->icon('heroicon-c-user-plus')
                 ->schema([
+                    Grid::make()
+                        ->schema([
+                            Forms\Components\TextInput::make('codigo')
+                                ->label('Codigo')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->required()
+                                ->default('TADMASS-P-' . rand(111111, 999999))
+                                ->disabled()
+                                ->dehydrated()
+                                ->unique()
+                                ->dehydrated()
+                                ->maxLength(255),
+
+                        ])->columns(4),
                     Forms\Components\TextInput::make('nombre')
                         ->required()
                         ->maxLength(255),
@@ -45,8 +61,12 @@ class VendedorResource extends Resource
                     Forms\Components\TextInput::make('direccion')
                         ->required()
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('tipo')
-                        ->maxLength(255),
+                    Select::make('tipo')
+                        ->required()
+                        ->options([
+                            'externo' => 'Externo Online',
+                            'oficina' => 'Oficina',
+                        ]),
                     Forms\Components\TextInput::make('registrado_por')
                         ->label('Registrado Por')
                         ->prefixIcon('heroicon-s-shield-check')
