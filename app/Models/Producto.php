@@ -22,16 +22,13 @@ class Producto extends Model
         'modelo',
         'fecha_vencimiento',
         'unidad_medida',
-
-        //precio al detal
-        'precio_venta_detal',
+        'precio_venta',
         'precio_compra_detal',
-
-        //precio al mayor
-        'precio_venta_mayor',
         'precio_compra_mayor',
         'status',
         'registrado_por',
+        'cantidad_por_bulto',
+        'tipo_venta',
     ];
 
     /**

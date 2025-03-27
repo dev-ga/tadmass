@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\Gasto;
 use App\Models\Pedido;
 use App\Models\Cliente;
 use Filament\Forms\Get;
@@ -14,12 +15,15 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Configuracion;
 use Filament\Resources\Resource;
+use Illuminate\Support\Collection;
 use Filament\Forms\Components\Grid;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\Actions\Action;
 use App\Filament\Resources\PedidoResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -50,18 +54,30 @@ class PedidoResource extends Resource
                                     ->dehydrated()
                                     ->unique()
                                     ->dehydrated()
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->hiddenOn(Pages\EditPedido::class),
 
                             ])->columns(4),
                         Select::make('cliente_id')
+                            ->prefixIcon('heroicon-c-list-bullet')
+                            ->label('Cliente')
                             ->options(Cliente::all()->pluck('nombre', 'id'))
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Debe seleccionar un cliente',
+                            ])
                             ->searchable(),
                         Select::make('vendedor_id')
+                            ->prefixIcon('heroicon-c-list-bullet')
+                            ->label('Vendedor')
                             ->options(Vendedor::all()->pluck('nombre', 'id'))
                             ->default(function (Get $get) {
                                 return Auth::user()->id;
                             })
+                            ->disabled()
+                            ->dehydrated()
                             ->searchable(),
+                            
                         Forms\Components\TextInput::make('registrado_por')
                             ->prefixIcon('heroicon-s-shield-check')
                             ->default(Auth::user()->name)
@@ -95,21 +111,27 @@ class PedidoResource extends Resource
                                             ->filter()
                                             ->contains($value);
                                     })
-                                    ->required()
                                     ->afterStateUpdated(function (Get $get, Set $set,) {
                                         //actualizamos el precio de venta
                                         $set('precio_venta', Producto::find($get('producto_id'))->precio_venta);
                                     })
-                                    ->live(),
+                                    ->live()
+                                    ->required()
+                                    ->validationMessages([
+                                        'required' => 'Debe seleccionar un producto',
+                                    ]),
                                 Forms\Components\TextInput::make('cantidad')
                                     ->label('Cantidad')
                                     ->integer()
                                     ->default(1)
                                     ->required(),
                                 Forms\Components\TextInput::make('precio_venta')
-                                    ->label('Precio')
-                                    ->default(0.00)
+                                    ->label('Precio de venta($)')
+                                    ->prefix('US$')
+                                    ->placeholder('0.00')
                                     ->numeric()
+                                    ->disabled()
+                                    ->dehydrated()
                                     ->required(),
                                     
                             ])
@@ -131,12 +153,14 @@ class PedidoResource extends Resource
                 Section::make()    
                     ->schema([
                         Forms\Components\TextInput::make('monto_usd')
+                            ->prefix('US$')
                             ->label('Monto USD($)')
                             ->required()
                             ->numeric()
                             ->default(0.00),
                         Forms\Components\TextInput::make('monto_bsd')
-                            ->label('Monto BSD(Bs.)')
+                            ->prefix('Bs.')
+                            ->label('Monto VES(Bs.)')
                             ->required()
                             ->numeric()
                             ->default(0.00),
@@ -162,11 +186,30 @@ class PedidoResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Estatus')
+                    ->badge()
+                    ->color(function (mixed $state): string {
+                        return match ($state) {
+                            'por-procesar' => 'warning',
+                            'procesado' => 'danger',
+                            default => 'success',
+                        };
+                    })
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('monto_usd')
+                    ->label('Monto USD($)')     
                     ->numeric()
+                    ->money('USD')
+                    ->badge()
+                    ->color('success')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('monto_bsd')
+                    ->label('Monto VES(Bs.)')
                     ->numeric()
+                    ->badge()
+                    ->color('success')
+                    ->icon('heroicon-o-credit-card')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
@@ -229,5 +272,15 @@ class PedidoResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return 'Administración';
+    }
+
+    public static function updateMontos(Get $get, Set $set): void
+    {
+        if ($get('metodo_pago') == 'usd') {
+            $set('monto_usd', $get('total_usd'));
+        }
+        if ($get('metodo_pago') == 'bsd') {
+            $set('monto_bsd', $get('total_bsd'));
+        }
     }
 }

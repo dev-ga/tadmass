@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ProductoResource\Pages;
 
 use Filament\Actions;
+use App\Models\Almacen;
 use App\Models\Inventario;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
@@ -28,12 +29,12 @@ class CreateProducto extends CreateRecord
 
             $registro_inventario = new Inventario();
             
-            if($this->data['feedback'] == 'mayor'){
+            if($this->data['tipo_venta'] == 'mayor'){
                 $registro_inventario->existencia = $this->data['existencia'];
-                $registro_inventario->almacen_id = $this->data['almacen_id'];
+                $registro_inventario->almacen_id = Almacen::where('tipo_almacen', $this->data['tipo_venta'])->first()->id;
                 $registro_inventario->producto_id = $this->record->id;
                 $registro_inventario->codigo = $this->record->codigo;
-                $registro_inventario->precio_venta_mayor = $this->data['precio_venta_mayor'];
+                $registro_inventario->precio_venta = $this->data['precio_venta'];
                 $registro_inventario->registrado_por = Auth::user()->name;
                 $registro_inventario->save();
 
@@ -49,12 +50,12 @@ class CreateProducto extends CreateRecord
                 
             }
 
-            if ($this->data['feedback'] == 'detal') {
+            if ($this->data['tipo_venta'] == 'detal') {
                 $registro_inventario->existencia = $this->data['existencia'];
-                $registro_inventario->almacen_id = $this->data['almacen_id'];
+                $registro_inventario->almacen_id = Almacen::where('tipo_almacen', $this->data['tipo_venta'])->first()->id;
                 $registro_inventario->producto_id = $this->record->id;
                 $registro_inventario->codigo = $this->record->codigo;
-                $registro_inventario->precio_venta_detal = $this->data['precio_venta_detal'];
+                $registro_inventario->precio_venta = $this->data['precio_venta'];
                 $registro_inventario->registrado_por = Auth::user()->name;
                 $registro_inventario->save();
 

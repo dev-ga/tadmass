@@ -12,8 +12,10 @@ use App\Models\Categoria;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
+use Illuminate\Support\Facades\Log;
 use Filament\Forms\Components\Radio;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
@@ -48,32 +50,32 @@ class ProductoResource extends Resource
                                     '4:3',
                                     '1:1',
                                 ]),
+
                         ])->columns(2),
                     
+                    //Tipo de venta
                     Section::make()
                         ->schema([
-                            ToggleButtons::make('feedback')
-                            ->label('Tipo de venta?')
-                            ->boolean()
-                            ->inline()
-                            ->inlineLabel(false)
-                            ->options([
-                                'mayor' => 'Mayor',
-                                'detal' => 'Detal',
-                            ]),
+                            Select::make('tipo_venta')
+                                ->options([
+                                    'mayor' => 'Al Mayor',
+                                    'detal' => 'Por Unidad',
+                                ])
                             
                         ])
                         ->afterStateUpdated(function (Get $get, $set) {
-                            if ($get('feedback') == 'mayor') {
+                            if ($get('tipo_venta') == 'mayor') {
                                 $set('codigo', 'TADMASS-M-' . rand(111111, 999999));
                                 $set('unidad_medida', 'bulto');
                             }
-                            if ($get('feedback') == 'detal') {
+                            if ($get('tipo_venta') == 'detal') {
                                 $set('codigo', 'TADMASS-D-' . rand(111111, 999999));
                                 $set('unidad_medida', 'unidad');
                             }
                         })
-                        ->live(),
+                        ->live()
+                        ->columns(3),
+
 
                     Section::make()
                         ->schema([
@@ -84,7 +86,8 @@ class ProductoResource extends Resource
                                 ->live()
                                 ->disabled()
                                 ->dehydrated()
-                                ->maxLength(255),
+                                ->maxLength(255)
+                                ->hiddenOn(Pages\EditProducto::class),
 
                             Forms\Components\TextInput::make('nombre')
                                 ->label('Nombre')
@@ -126,15 +129,16 @@ class ProductoResource extends Resource
                                 ->disabled()
                                 ->dehydrated()
                                 ->maxLength(255),
-                                
+
                             //Vental Detal
                             //-------------------------------------------------------
-                            Forms\Components\TextInput::make('precio_venta_detal')
+                    
+                            Forms\Components\TextInput::make('precio_venta')
                                 ->prefixIcon('heroicon-c-clipboard-document-list')
                                 ->label('Precio Venta(Detal)')
                                 ->hint('Separador decimal(.)')
                                 ->hidden(function (Get $get) {
-                                    return $get('feedback') == 'mayor';
+                                    return $get('tipo_venta') == 'mayor';
                                 })
                                 ->numeric(),
                             Forms\Components\TextInput::make('precio_compra_detal')
@@ -142,20 +146,27 @@ class ProductoResource extends Resource
                                 ->label('Precio Compra(Detal)')
                                 ->hint('Separador decimal(.)')
                                 ->hidden(function (Get $get) {
-                                    return $get('feedback') == 'mayor';
+                                    return $get('tipo_venta') == 'mayor';
                                 })
                                 ->numeric(),
-                            //-------------------------------------------------------
+                    //-------------------------------------------------------
 
 
                             //Vental Mayor
                             //-------------------------------------------------------
-                            Forms\Components\TextInput::make('precio_venta_mayor')
+                            Forms\Components\TextInput::make('cantidad_por_bulto')
                                 ->prefixIcon('heroicon-c-clipboard-document-list')
-                                ->label('Precio Venta(Mayor)')
+                                ->label('Cantidad por Bulto')
+                                ->hidden(function (Get $get) {
+                                    return $get('tipo_venta') == 'detal';
+                                })
+                                ->numeric(),
+                            Forms\Components\TextInput::make('precio_venta')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->label('Precio Venta')
                                 ->hint('Separador decimal(.)')
                                 ->hidden(function (Get $get) {
-                                    return $get('feedback') == 'detal';
+                                    return $get('tipo_venta') == 'detal';
                                 })
                                 ->numeric(),
                             Forms\Components\TextInput::make('precio_compra_mayor')
@@ -163,7 +174,7 @@ class ProductoResource extends Resource
                                 ->label('Precio Compra(Mayor)')
                                 ->hint('Separador decimal(.)')
                                 ->hidden(function (Get $get) {
-                                    return $get('feedback') == 'detal';
+                                    return $get('tipo_venta') == 'detal';
                                 })
                                 ->numeric(),
                             //-------------------------------------------------------
@@ -178,7 +189,7 @@ class ProductoResource extends Resource
                                     
                         ])
                         ->hidden(function (Get $get) {
-                            return $get('feedback') == false;
+                            return $get('tipo_venta') == false;
                         })
                         ->columns(3),
 
@@ -188,15 +199,19 @@ class ProductoResource extends Resource
                 ->description('Informacion para el registro de la Entrada de Inventario. Campos Requeridos(*)')
                 ->icon('heroicon-m-list-bullet')
                 ->schema([
-
-                    Forms\Components\Select::make('almacen_id')
-                        ->label('Almacen')
-                        ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->required()
-                        ->options(Almacen::all()->pluck('nombre', 'id'))
-                        ->searchable(),
                     Forms\Components\TextInput::make('existencia')
                         ->label('Existencia')
+                        ->hint(function (Get $get) {
+                            if($get('tipo_venta') == 'detal'){
+                                return 'Existencia por Unidad';
+                            }
+
+                            if ($get('tipo_venta') == 'mayor') {
+                                return 'Existencia en Bultos';
+                            }
+                            
+                            return;
+                        })
                         ->prefixIcon('heroicon-c-clipboard-document-list')
                         ->required()
                         ->numeric(),
@@ -208,9 +223,10 @@ class ProductoResource extends Resource
                         ->dehydrated()
                 ])
                 ->hidden(function (Get $get) {
-                    return $get('feedback') == false;
+                    return $get('tipo_venta') == false;
                 })
-                ->columns(3),
+                ->columns(2)
+                ->hiddenOn(Pages\EditProducto::class),
             ]);
     }
 

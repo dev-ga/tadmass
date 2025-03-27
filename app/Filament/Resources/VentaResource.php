@@ -29,191 +29,193 @@ class VentaResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-c-presentation-chart-line';
 
-    public static function form(Form $form): Form
-    {
-        $products = Producto::get();
-        return $form
-            ->schema([
-                Section::make()
-                    ->schema([
-                        Grid::make()
-                            ->schema([
-                                Forms\Components\TextInput::make('codigo')
-                                    ->label('Codigo')
-                                    ->prefixIcon('heroicon-c-clipboard-document-list')
-                                    ->required()
-                                    ->default('TADMASS-C-' . rand(111111, 999999))
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->unique()
-                                    ->dehydrated()
-                                    ->maxLength(255),
-                            ])->columns(4),
-                        Forms\Components\Select::make('cliente_id')
-                            ->relationship('cliente', 'nombre')
-                            ->required(),
-                        Forms\Components\Select::make('vendedor_id')
-                            ->relationship('vendedor', 'nombre')
-                            ->required(),
-                        Forms\Components\TextInput::make('registrado_por')
-                            ->prefixIcon('heroicon-s-shield-check')
-                            ->default(Auth::user()->name)
-                            ->disabled()
-                            ->dehydrated()
-                            ->maxLength(255),
-                    ])->columnSpan('full')->columns(3),
+    // public static function form(Form $form): Form
+    // {
+    //     $products = Producto::get();
+    //     return $form
+    //         ->schema([
+    //             Section::make()
+    //                 ->schema([
+    //                     Grid::make()
+    //                         ->schema([
+    //                             Forms\Components\TextInput::make('codigo')
+    //                                 ->label('Codigo')
+    //                                 ->prefixIcon('heroicon-c-clipboard-document-list')
+    //                                 ->required()
+    //                                 ->default('TADMASS-V-' . rand(111111, 999999))
+    //                                 ->disabled()
+    //                                 ->dehydrated()
+    //                                 ->unique()
+    //                                 ->dehydrated()
+    //                                 ->maxLength(255),
+    //                         ])->columns(4),
+    //                     Forms\Components\Select::make('cliente_id')
+    //                         ->prefixIcon('heroicon-c-list-bullet')
+    //                         ->relationship('cliente', 'nombre')
+    //                         ->required(),
+    //                     Forms\Components\Select::make('vendedor_id')
+    //                         ->prefixIcon('heroicon-c-list-bullet')
+    //                         ->relationship('vendedor', 'nombre')
+    //                         ->required(),
+    //                     Forms\Components\TextInput::make('registrado_por')
+    //                         ->prefixIcon('heroicon-s-shield-check')
+    //                         ->default(Auth::user()->name)
+    //                         ->disabled()
+    //                         ->dehydrated()
+    //                         ->maxLength(255),
+    //                 ])->columnSpan('full')->columns(3),
                 
-                Section::make()
-                    ->schema([
-                        // Repeatable field for invoice items
-                        Forms\Components\Repeater::make('productos')
-                            // Defined as a relationship to the InvoiceProduct model
-                            ->relationship('detalles')
-                            ->schema([
+    //             Section::make()
+    //                 ->schema([
+    //                     // Repeatable field for invoice items
+    //                     Forms\Components\Repeater::make('productos')
+    //                         // Defined as a relationship to the InvoiceProduct model
+    //                         ->relationship('detalles')
+    //                         ->schema([
                                 
-                                Forms\Components\Select::make('producto_id')
-                                    ->relationship('productos', 'nombre')
-                                    // Options are all products, but we have modified the display to show the price as well
-                                    ->options(
-                                        // Producto::all()->pluck('nombre', 'id')
-                                        $products->mapWithKeys(function (Producto $product) {
-                                            return [$product->id => sprintf('%s ($%s)', $product->nombre, $product->precio_venta)];
-                                        })
-                                    )
-                                    // Disable options that are already selected in other rows
-                                    ->disableOptionWhen(function ($value, $state, Get $get) {
-                                        return collect($get('../*.producto_id'))
-                                            ->reject(fn($id) => $id == $state)
-                                            ->filter()
-                                            ->contains($value);
-                                    })
-                                    ->required()
-                                    ->afterStateUpdated(function (Get $get, Set $set,) {
-                                        //actualizamos el precio de venta
-                                        $set('precio_venta', Producto::find($get('producto_id'))->precio_venta);
-                                    })
-                                    ->live(),
+    //                             Forms\Components\Select::make('producto_id')
+    //                                 ->relationship('productos', 'nombre')
+    //                                 // Options are all products, but we have modified the display to show the price as well
+    //                                 ->options(
+    //                                     // Producto::all()->pluck('nombre', 'id')
+    //                                     $products->mapWithKeys(function (Producto $product) {
+    //                                         return [$product->id => sprintf('%s ($%s)', $product->nombre, $product->precio_venta)];
+    //                                     })
+    //                                 )
+    //                                 // Disable options that are already selected in other rows
+    //                                 ->disableOptionWhen(function ($value, $state, Get $get) {
+    //                                     return collect($get('../*.producto_id'))
+    //                                         ->reject(fn($id) => $id == $state)
+    //                                         ->filter()
+    //                                         ->contains($value);
+    //                                 })
+    //                                 ->required()
+    //                                 ->afterStateUpdated(function (Get $get, Set $set,) {
+    //                                     //actualizamos el precio de venta
+    //                                     $set('precio_venta', Producto::find($get('producto_id'))->precio_venta);
+    //                                 })
+    //                                 ->live(),
                                     
-                                Forms\Components\TextInput::make('cantidad')
-                                    ->integer()
-                                    ->default(1)
-                                    ->required(),
+    //                             Forms\Components\TextInput::make('cantidad')
+    //                                 ->integer()
+    //                                 ->default(1)
+    //                                 ->required(),
 
-                                Forms\Components\TextInput::make('precio_venta')
-                                    ->label('Precio')
-                                    ->default(0.00)
-                                    ->numeric()
-                                    ->required(),
-                            ])
-                            // Repeatable field is live so that it will trigger the state update on each change
-                            ->live()
-                            // After adding a new row, we need to update the totals
-                            ->afterStateUpdated(function (Get $get, Set $set, ) {
-                                // Log::info($data['product_id']);
-                                self::updateTotals($get, $set);
-                            })
-                            // After deleting a row, we need to update the totals
-                            ->deleteAction(
-                                fn(Action $action) => $action->after(fn(Get $get, Set $set) => self::updateTotals($get, $set)),
-                            )
-                            // Disable reordering
-                            ->reorderable(false)
-                            ->columns(3)
+    //                             Forms\Components\TextInput::make('precio_venta')
+    //                                 ->label('Precio')
+    //                                 ->prefix('US$')
+    //                                 ->default(0.00)
+    //                                 ->numeric()
+    //                                 ->required(),
+    //                         ])
+    //                         // Repeatable field is live so that it will trigger the state update on each change
+    //                         ->live()
+    //                         // After adding a new row, we need to update the totals
+    //                         ->afterStateUpdated(function (Get $get, Set $set, ) {
+    //                             // Log::info($data['product_id']);
+    //                             self::updateTotals($get, $set);
+    //                         })
+    //                         // After deleting a row, we need to update the totals
+    //                         ->deleteAction(
+    //                             fn(Action $action) => $action->after(fn(Get $get, Set $set) => self::updateTotals($get, $set)),
+    //                         )
+    //                         // Disable reordering
+    //                         ->reorderable(false)
+    //                         ->columns(3)
                             
-                    ])->columnSpan(2)->columns(1),
+    //                 ])->columnSpan(2)->columns(1),
 
-                Section::make()
-                    ->schema([
+    //             Section::make()
+    //                 ->schema([
                         
-                        Grid::make()
-                            ->schema([
-                                Forms\Components\TextInput::make('subtotal')
-                                    ->numeric()
-                                    // Read-only, because it's calculated
-                                    ->readOnly()
-                                    ->prefix('$')
-                                    // This enables us to display the subtotal on the edit page load
-                                    ->afterStateHydrated(function (Get $get, Set $set) {
-                                        self::updateTotals($get, $set);
-                                    }),
-                                Forms\Components\TextInput::make('iva')
-                                    ->suffix('%')
-                                    ->required()
-                                    ->numeric()
-                                    ->default(Configuracion::first()->iva)
-                                    // Live field, as we need to re-calculate the total on each change
-                                    ->live(true)
-                                    // This enables us to display the subtotal on the edit page load
-                                    ->afterStateUpdated(function (Get $get, Set $set) {
-                                        self::updateTotals($get, $set);
-                                    })
+    //                     Grid::make()
+    //                         ->schema([
+    //                             Forms\Components\TextInput::make('subtotal')
+    //                                 ->numeric()
+    //                                 // Read-only, because it's calculated
+    //                                 ->readOnly()
+    //                                 ->prefix('US$')
+    //                                 // This enables us to display the subtotal on the edit page load
+    //                                 ->afterStateHydrated(function (Get $get, Set $set) {
+    //                                     self::updateTotals($get, $set);
+    //                                 }),
+    //                             Forms\Components\TextInput::make('iva')
+    //                                 ->prefix('%')
+    //                                 ->required()
+    //                                 ->numeric()
+    //                                 ->default(Configuracion::first()->iva)
+    //                                 // Live field, as we need to re-calculate the total on each change
+    //                                 ->live(true)
+    //                                 // This enables us to display the subtotal on the edit page load
+    //                                 ->afterStateUpdated(function (Get $get, Set $set) {
+    //                                     self::updateTotals($get, $set);
+    //                                 })
                                 
-                            ])->columns(2),
+    //                         ])->columns(2),
                             
-                        Grid::make()
-                            ->schema([
-                                Forms\Components\TextInput::make('total_usd')
-                                    ->label('Total Dolares($)')
-                                    ->numeric()
-                                    // Read-only, because it's calculated
-                                    ->readOnly()
-                                    ->prefix('$'),
-                                Forms\Components\TextInput::make('total_bsd')
-                                    ->label('Total Bolivares(Bs.)')
-                                    ->numeric()
-                                    // Read-only, because it's calculated
-                                    ->readOnly()
-                                    ->prefix('Bs.'),
+    //                     Grid::make()
+    //                         ->schema([
+    //                             Forms\Components\TextInput::make('total_usd')
+    //                                 ->label('Total Dolares($)')
+    //                                 ->numeric()
+    //                                 // Read-only, because it's calculated
+    //                                 ->readOnly()
+    //                                 ->prefix('US$'),
+    //                             Forms\Components\TextInput::make('total_bsd')
+    //                                 ->label('Total Bolivares(Bs.)')
+    //                                 ->numeric()
+    //                                 // Read-only, because it's calculated
+    //                                 ->readOnly()
+    //                                 ->prefix('Bs.'),
                                 
-                            ])->columns(2),
+    //                         ])->columns(2),
                             
-                        ToggleButtons::make('metodo_pago')
-                            ->label('Metodo de Pago')
-                            ->options([
-                                'usd' => 'USD($)',
-                                'bsd' => 'VES(Bs.)',
-                                'multiple' => 'Multiple'
-                            ])
-                            ->afterStateUpdated(function (Get $get, Set $set) {
-                                self::updateMontos($get, $set);
-                            })
-                            ->icons([
-                                'usd' => 'heroicon-o-currency-dollar',
-                                'bsd' => 'heroicon-m-banknotes',
-                                'multiple' => 'heroicon-o-currency-dollar',
-                            ])
-                            ->live()
-                            ->inline(),
+    //                     ToggleButtons::make('metodo_pago')
+    //                         ->label('Metodo de Pago')
+    //                         ->options([
+    //                             'usd' => 'USD($)',
+    //                             'bsd' => 'VES(Bs.)',
+    //                             'multiple' => 'Multiple'
+    //                         ])
+    //                         ->afterStateUpdated(function (Get $get, Set $set) {
+    //                             self::updateMontos($get, $set);
+    //                         })
+    //                         ->icons([
+    //                             'usd' => 'heroicon-o-currency-dollar',
+    //                             'bsd' => 'heroicon-m-banknotes',
+    //                             'multiple' => 'heroicon-o-currency-dollar',
+    //                         ])
+    //                         ->live()
+    //                         ->inline(),
 
-                        Grid::make()
-                            ->schema([
-                                
-                                Forms\Components\TextInput::make('monto_usd')
-                                    ->label('Monto($)')
-                                    ->numeric()
-                                    ->afterStateUpdated(function (Get $get, Set $set) {
-                                        $total = $get('total_usd') - $get('monto_usd');
-                                        $set('monto_bsd', $total * Configuracion::first()->tasa_bcv);
-                                    })
-                                    ->live(true)
-                                    ->prefix('$'),
+    //                     Grid::make()
+    //                         ->schema([
+    //                             Forms\Components\TextInput::make('monto_usd')
+    //                                 ->label('Monto($)')
+    //                                 ->numeric()
+    //                                 ->afterStateUpdated(function (Get $get, Set $set) {
+    //                                     $total = $get('total_usd') - $get('monto_usd');
+    //                                     $set('monto_bsd', $total * Configuracion::first()->tasa_bcv);
+    //                                 })
+    //                                 ->live(true)
+    //                                 ->prefix('$'),
                                     
-                                Forms\Components\TextInput::make('monto_bsd')
-                                    ->label('Monto(Bs.)')
-                                    ->numeric()
-                                    // Read-only, because it's calculated
-                                    ->readOnly()
-                                    ->prefix('$'),
+    //                             Forms\Components\TextInput::make('monto_bsd')
+    //                                 ->label('Monto(Bs.)')
+    //                                 ->numeric()
+    //                                 // Read-only, because it's calculated
+    //                                 ->readOnly()
+    //                                 ->prefix('$'),
 
-                            ])
-                            ->hidden(fn (Get $get) => $get('metodo_pago') != 'multiple')
-                            ->columns(2),
+    //                         ])
+    //                         ->hidden(fn (Get $get) => $get('metodo_pago') != 'multiple')
+    //                         ->columns(2),
                         
-                    ])->columnSpan(1)->columns(1),
+    //                 ])->columnSpan(1)->columns(1),
                     
-            ])->columns(3);
+    //         ])->columns(3);
             
-    }
+    // }
 
     public static function table(Table $table): Table
     {

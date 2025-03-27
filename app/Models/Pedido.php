@@ -18,11 +18,12 @@ class Pedido extends Model
         'monto_bsd',
         'productos',
         'registrado_por',
+        'status'
     ];
 
     //cast
     protected $casts = [
-        'productos' => 'json',
+        'tipo_usd' => 'array',
     ];
 
     /**
@@ -48,6 +49,16 @@ class Pedido extends Model
     public function detalles(): HasMany
     {
         return $this->hasMany(PedidoDetalle::class);
+    }
+
+    /**
+     * Get the user associated with the Pedido
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function status(): HasOne
+    {
+        return $this->hasOne(Statu::class, 'id', 'status');
     }
 
 }

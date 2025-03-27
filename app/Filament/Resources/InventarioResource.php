@@ -8,10 +8,12 @@ use Filament\Forms\Form;
 use App\Models\Inventario;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\InventarioResource\Pages;
+use App\Http\Controllers\MovimientoInventarioController;
 use App\Filament\Resources\InventarioResource\RelationManagers;
 use App\Filament\Resources\InventarioResource\RelationManagers\MovimientoInventariosRelationManager;
 
@@ -88,18 +90,11 @@ class InventarioResource extends Resource
                 Tables\Columns\TextColumn::make('existencia')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('precio_venta_mayor')
+                Tables\Columns\TextColumn::make('precio_venta')
                     ->badge()
                     ->color('success')
                     ->icon('heroicon-s-currency-dollar')
-                    ->label('Precio Venta Mayor($)')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('precio_venta_detal')
-                    ->badge()
-                    ->color('success')
-                    ->icon('heroicon-s-currency-dollar')
-                    ->label('Precio Venta Detal($)')
+                    ->label('Precio US$')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('registrado_por')
@@ -123,6 +118,27 @@ class InventarioResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('Mover Existencia')
+                    ->label('Mover Existencia')
+                    ->color('warning')
+                    ->icon('heroicon-s-truck')
+                    ->form([
+                        Forms\Components\Select::make('almacen_id')
+                            ->prefixIcon('heroicon-c-clipboard-document-list')
+                            ->relationship('almacen', 'nombre')
+                            ->required(),
+                        Forms\Components\TextInput::make('cantidad')
+                            ->label('Cantidad en Bultos')
+                            ->prefixIcon('heroicon-c-clipboard-document-list')
+                            ->required(),
+                    ])
+                    ->action(function (Collection $records, array $data) {
+                        // dd(str_replace('-M-', '-D-',  $records[0]->codigo), $records[0]->codigo, $records);
+                        $mover_existencia = MovimientoInventarioController::mover_existencia($records, $data);
+
+                    })
+                    
+                    
                 ]),
             ]);
     }
