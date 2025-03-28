@@ -11,6 +11,7 @@ class Cliente extends Model
     protected $table = 'clientes';
     
     protected $fillable = [
+        'codigo',
         'nombre',
         'ci_rif',
         'email',
@@ -26,7 +27,7 @@ class Cliente extends Model
      */
     public function ventas(): HasMany
     {
-        return $this->hasMany(Venta::class, 'venta_id', 'id');
+        return $this->hasMany(Venta::class, 'cliente_id', 'id');
     }
     
 

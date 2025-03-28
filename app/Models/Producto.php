@@ -18,33 +18,27 @@ class Producto extends Model
         'descripcion',
         'categoria_id',
         'imagen',
-        'exitencia_real',
         'marca',
         'modelo',
         'fecha_vencimiento',
         'unidad_medida',
-
-        //precio al detal
-        'precio_detal',
+        'precio_venta',
         'precio_compra_detal',
-        'precio_venta_detal',
-
-        //precio al mayor
-        'precio_mayor',
         'precio_compra_mayor',
-        'precio_venta_mayor',
         'status',
         'registrado_por',
+        'cantidad_por_bulto',
+        'tipo_venta',
     ];
 
     /**
      * Get the inventario that owns the Producto
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function categoria(): BelongsTo
+    public function categoria(): HasOne
     {
-        return $this->belongsTo(Categoria::class, 'id', 'categoria_id');
+        return $this->hasOne(Categoria::class, 'id', 'categoria_id');
     }
 
     /**
@@ -76,6 +70,23 @@ class Producto extends Model
     {
         return $this->hasMany(MovimientoInventario::class, 'producto_id', 'id');
     }
+
+    /**
+     * Get all of the comments for the Producto
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function venta(): HasMany
+    {
+        return $this->hasMany(Venta::class, 'foreign_key', 'local_key');
+    }
+
+    public function detallesPedidos()
+    {
+        return $this->hasMany(PedidoDetalle::class);
+    }
+
+    //Modelo entidad relacion de las tablas productosm pedidos y detalles de pedidos en laravel 12 usando filament v3?
 
     
 }

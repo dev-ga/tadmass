@@ -13,12 +13,14 @@ use App\Models\MetodoPago;
 use Filament\Tables\Table;
 use App\Models\Configuracion;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\ToggleButtons;
 use App\Filament\Resources\GastoResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\GastoResource\RelationManagers;
+use App\Filament\Resources\GastoResource\RelationManagers\GastoDetallesRelationManager;
 
 class GastoResource extends Resource
 {
@@ -32,13 +34,22 @@ class GastoResource extends Resource
             ->schema([
                 Forms\Components\Section::make('INFORMACION DEL GASTOS')
                     ->description('Formulario de gastos')
-                    ->icon('heroicon-m-arrow-trending-down')
+                    ->icon('heroicon-m-credit-card')
                     ->schema([
+                        Grid::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('codigo')
+                                    ->label('Codigo')
+                                    ->prefixIcon('heroicon-c-clipboard-document-list')
+                                    ->required()
+                                    ->default('TADMASS-G-' . rand(111111, 999999))
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->unique()
+                                    ->dehydrated()
+                                    ->maxLength(255),
 
-                        Forms\Components\TextInput::make('codigo')
-                            ->label('Codigo de gasto')
-                            ->prefixIcon('heroicon-c-clipboard-document-list')
-                            ->default('G-'.random_int(11111, 999999)),
+                            ])->columns(4),
                             
                         Forms\Components\TextInput::make('nro_control')
                             ->label('Nro. de Control')
@@ -74,11 +85,14 @@ class GastoResource extends Resource
                             ->searchable()
                             ->preload()
                             ->createOptionForm([
-                                Forms\Components\TextInput::make('rif')
-                                    ->label('Rif')
+                                Forms\Components\TextInput::make('ci_rif')
+                                    ->label('CI o RIF')
                                     ->required(),
                                 Forms\Components\TextInput::make('nombre')
                                     ->label('Nombre/Razon Social')
+                                    ->required(),
+                                Forms\Components\TextInput::make('registrado_por')
+                                    ->label('Registrado por:')
                                     ->required(),
                             ])
                             ->required(),
@@ -122,20 +136,9 @@ class GastoResource extends Resource
                             ])
                     ])->columns(2),
 
-                Forms\Components\Section::make('ASOCIADO A:')
-                    ->description('Formulario de gastos')
-                    ->icon('heroicon-m-arrow-trending-down')
-                    ->schema([
-                        Forms\Components\Select::make('almacen_id')
-                            ->prefixIcon('heroicon-m-numbered-list')
-                            ->live()
-                            ->label('Almacenes')
-                            ->options(Almacen::all()->pluck('nombre', 'id')),
-                    ])->columns(1),
-
                 Forms\Components\Section::make('COSTOS:')
                     ->description('Formulario de gastos')
-                    ->icon('heroicon-m-arrow-trending-down')
+                    ->icon('heroicon-m-credit-card')
                     ->schema([
 
                         ToggleButtons::make('feedback')
@@ -180,6 +183,19 @@ class GastoResource extends Resource
                             ->afterStateUpdated(function (Get $get, Set $set) {
                                 self::updateTotales($get, $set);
                             })
+                            ->placeholder('0.00'),
+
+                        Forms\Components\TextInput::make('exento')
+                            ->label('Exento(Bs.)')
+                            ->prefixIcon('heroicon-m-credit-card')
+                            ->hidden(function (Get $get) {
+                                if ($get('forma_pago') == 'bolivares') {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            })
+                            ->numeric()
                             ->placeholder('0.00'),
 
                         Forms\Components\TextInput::make('monto_bsd')
@@ -235,13 +251,6 @@ class GastoResource extends Resource
                             ->placeholder('0.00'),
 
                     ])
-                    ->hidden(function (Get $get) {
-                        if ($get('sucursal_id')  || $get('almacen_id') != null) {
-                            return false;
-                        } else {
-                            return true;
-                        }
-                    })
                     ->columns(2),
             ]);
     }
@@ -316,7 +325,7 @@ class GastoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            GastoDetallesRelationManager::class
         ];
     }
 
@@ -331,17 +340,25 @@ class GastoResource extends Resource
 
     public static function updateTotales(Get $get, Set $set): void
     {
-        $parametro_iva = Configuracion::first()->iva;
+        $parametro = Configuracion::first();
 
-        if ($get('feedback') == true) {
-            $iva = $get('monto_bsd') * $parametro_iva;
+        if ($get('feedback') == true && $get('exento') == null) {
+            $iva = $get('monto_bsd') * $parametro->iva;
             $set('iva', round($iva, 2));
             $set('total_gasto_bsd',  round(($get('monto_bsd') + $iva), 2));
             $set('conversion_a_usd', round($get('total_gasto_bsd') / $get('tasa_bcv'), 2));
         }
 
+        if ($get('feedback') == true && $get('exento') != null) {
+            $iva = $get('monto_bsd') * $parametro->iva;
+            $set('iva', round($iva, 2));
+            $set('total_gasto_bsd',  round(($get('monto_bsd') + $iva + $get('exento')), 2));
+            $set('conversion_a_usd', round($get('total_gasto_bsd') / $get('tasa_bcv'), 2));
+        }
+
         if ($get('feedback') == false && $get('forma_pago') == 'dolares') {
-            $set('conversion_a_usd', round($get('monto_usd'), 2));
+            $set('total_gasto_bsd', round($parametro->tasa_bcv * $get('monto_usd'), 2));
+            $set('conversion_a_usd', $get('monto_usd'));
         }
 
         if ($get('feedback') == false && $get('forma_pago') == 'bolivares') {

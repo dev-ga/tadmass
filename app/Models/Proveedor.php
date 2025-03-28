@@ -12,10 +12,11 @@ class Proveedor extends Model
 
     //fillable
     protected $fillable = [
-        'id',
+        'codigo',
+        'ci_rif',
         'nombre',
         'telefono',
-        'correo',
+        'email',
         'direccion',
         'registrado_por',
     ];

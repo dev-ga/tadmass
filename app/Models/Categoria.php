@@ -11,6 +11,8 @@ class Categoria extends Model
     protected $table = 'categorias';
     
     protected $fillable = [
+        'codigo',
+        'comision',
         'nombre',
         'slug',
         'registrado_por'

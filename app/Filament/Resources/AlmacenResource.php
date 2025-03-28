@@ -9,6 +9,7 @@ use App\Models\Almacen;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,6 +32,21 @@ class AlmacenResource extends Resource
                 ->icon('heroicon-c-building-library')
                 ->schema([
 
+                    Grid::make()
+                        ->schema([
+                            Forms\Components\TextInput::make('codigo')
+                                ->label('Codigo')
+                                ->prefixIcon('heroicon-c-clipboard-document-list')
+                                ->required()
+                                ->default('TADMASS-A-' . rand(111111, 999999))
+                                ->disabled()
+                                ->dehydrated()
+                                ->unique()
+                                ->dehydrated()
+                                ->maxLength(255),
+
+                        ])->columns(4),
+
                     Forms\Components\TextInput::make('nombre')
                         ->prefixIcon('heroicon-c-clipboard-document-list')
                         ->label('Nombre de Almacen')
@@ -47,10 +63,13 @@ class AlmacenResource extends Resource
                         ->tel()
                         ->required()
                         ->maxLength(255),
-                    Select::make('responsable_almacen')
+                    Select::make('tipo_almacen')
                         ->prefixIcon('heroicon-m-numbered-list')
-                        ->label('Responsable del Almacen')
-                        ->options(User::all()->pluck('name', 'id'))
+                        ->label('Tipo de almacen')
+                        ->options([
+                            'mayor' => 'Mayorista',
+                            'detal' => 'Detal',
+                        ])
                         ->searchable(),
                     Forms\Components\TextInput::make('registrado_por')
                         ->prefixIcon('heroicon-s-shield-check')
@@ -58,7 +77,6 @@ class AlmacenResource extends Resource
                         ->disabled()
                         ->dehydrated()
                         ->maxLength(255),
-
 
                 ])->columns(2),
             ]);
@@ -68,20 +86,24 @@ class AlmacenResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('codigo')
+                    ->badge()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('tipo_almacen')
+                    ->badge()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('direccion')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('telefono')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('responsable_almacen')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('registrado_por')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()

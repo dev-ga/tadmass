@@ -17,10 +17,8 @@ class Inventario extends Model
         'codigo',
         'almacen_id',
         'producto_id',
-        'categoria_id',
         'existencia',
-        'precio_venta_mayor',
-        'precio_venta_detal',
+        'precio_venta',
         'registrado_por',
     ];
 

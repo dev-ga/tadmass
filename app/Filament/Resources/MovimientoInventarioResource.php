@@ -31,6 +31,36 @@ class MovimientoInventarioResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('codigo_producto')
+                    ->badge()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('producto.nombre')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('tipo')
+                    ->label('Tipo de Movimiento')
+                    ->badge()
+                    ->color(function (mixed $state): string {
+                        return match ($state) {
+                            'entrada' => 'success',
+                            'salida' => 'danger',
+                        };
+                    })
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('cantidad')
+                    ->badge()
+                    ->color('success')
+                    ->icon('heroicon-c-shopping-cart')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Fecha de Registro')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 //
             ])
             ->filters([
