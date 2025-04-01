@@ -24,6 +24,7 @@ class VentaResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('codigo')
+                    ->label('Código')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('cliente_id')
@@ -73,6 +74,7 @@ class VentaResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
+                    ->label('Código')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('cliente.id')
                     ->searchable(),

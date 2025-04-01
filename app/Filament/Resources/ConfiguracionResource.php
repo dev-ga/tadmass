@@ -20,6 +20,8 @@ class ConfiguracionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-c-cog-8-tooth';
 
+    protected static ?string $navigationLabel = 'Configuración del sistema';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -29,22 +31,27 @@ class ConfiguracionResource extends Resource
                     ->icon('heroicon-s-user-group')
                     ->schema([
                         Forms\Components\TextInput::make('iva')
+                            ->label('IVA')
                             ->required()
                             ->numeric()
                             ->default(0.00),
                         Forms\Components\TextInput::make('isrl')
+                            ->label('ISLR')
                             ->required()
                             ->numeric()
                             ->default(0.00),
                         Forms\Components\TextInput::make('porcen_venta_detal')
+                            ->label('% VENTA DETAL')
                             ->required()
                             ->numeric()
                             ->default(0.00),
                         Forms\Components\TextInput::make('porcen_venta_mayor')
+                            ->label('% VENTA MAYOR')
                             ->required()
                             ->numeric()
                             ->default(0.00),
                         Forms\Components\TextInput::make('porcen_venta_general')
+                            ->label('% VENTA GENERAL')
                             ->required()
                             ->numeric()
                             ->default(0.00),
@@ -55,8 +62,9 @@ class ConfiguracionResource extends Resource
                         Forms\Components\TextInput::make('graficos_filament_heading')
                             ->required()
                             ->maxLength(255)
-                            ->default('Grafico'),
+                            ->default('Gráfico'),
                         Forms\Components\TextInput::make('graficos_filament_getType')
+                            ->label('Tipo de Gráfico')
                             ->required()
                             ->maxLength(255)
                             ->default('bar'),
@@ -103,7 +111,7 @@ class ConfiguracionResource extends Resource
                         Forms\Components\TextInput::make('dash_panel_titulo')
                             ->maxLength(255),
                     ])->columns(3),
-                
+
             ]);
     }
 

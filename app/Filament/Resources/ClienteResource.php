@@ -34,7 +34,7 @@ class ClienteResource extends Resource
                     Grid::make()
                         ->schema([
                             Forms\Components\TextInput::make('codigo')
-                                ->label('Codigo')
+                                ->label('Código')
                                 ->prefixIcon('heroicon-c-clipboard-document-list')
                                 ->required()
                                 ->default('TADMASS-CLI-' . rand(111111, 999999))
@@ -64,13 +64,13 @@ class ClienteResource extends Resource
                         ->maxLength(255),
                     Forms\Components\TextInput::make('telefono')
                         ->prefixIcon('heroicon-m-phone')
-                        ->label('Nro. de Telefono')
+                        ->label('Nro. de Teléfono')
                         ->tel()
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('direccion')
                         ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Dirección')    
+                        ->label('Dirección')
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('registrado_por')
@@ -89,16 +89,20 @@ class ClienteResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
+                    ->label('Código')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('ci_rif')
+                    ->label('CI/RIF')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('telefono')
+                    ->label('Nro. de Teléfono')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('direccion')
+                    ->label('Dirección')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('registrado_por')
                     ->searchable(),

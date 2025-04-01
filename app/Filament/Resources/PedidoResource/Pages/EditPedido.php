@@ -51,11 +51,11 @@ class EditPedido extends EditRecord
                                 return $this->record->monto_bsd ?? 0.00;
                             })
                     ])->columns(2),
- 
+
                 Section::make()
                     ->schema([
                         ToggleButtons::make('metodo_pago')
-                            ->label('Metodo de Pago')
+                            ->label('Método de Pago')
                             ->options([
                                 'usd' => 'USD($)',
                                 'bsd' => 'VES(Bs.)',
@@ -177,7 +177,7 @@ class EditPedido extends EditRecord
                                         )
                                         ->live(true)
                                         ->placeholder('0.00')
-                                        ->prefix('$'),
+                                        ->prefix('US$'),
 
                                     TextInput::make('pago_bsd')
                                         ->label('Monto(Bs.)')
@@ -187,7 +187,7 @@ class EditPedido extends EditRecord
                                         ->disabled()
                                         ->dehydrated()
                                         ->placeholder('0.00')
-                                        ->prefix('$'),
+                                        ->prefix('Bs.'),
 
                                     TextInput::make('multiple_ref_bsd')
                                         ->label('Referencia Bs.')
@@ -214,9 +214,9 @@ class EditPedido extends EditRecord
                     ])->columnSpan(1)->columns(1),
             ])
             ->action(function ($data) {
-                
+
                 if($data['metodo_pago'] == 'usd'){
-                    
+
                     $registro_venta_usd = VentaController::registrar_venta_usd($this->record, $data, $this->record->detalles->toArray());
                     if ($registro_venta_usd['success'] == true) {
                         Notification::make()
@@ -231,9 +231,9 @@ class EditPedido extends EditRecord
                             ->send();
                     }
                 }
-                
+
                 if($data['metodo_pago'] == 'bsd'){
-                    
+
                     $registro_venta_bsd = VentaController::registrar_venta_bsd($this->record, $data, $this->record->detalles->toArray());
                     if ($registro_venta_bsd['success'] == true) {
                         Notification::make()
@@ -248,9 +248,9 @@ class EditPedido extends EditRecord
                             ->send();
                     }
                 }
-                
+
                 if($data['metodo_pago'] == 'multiple'){
-                    
+
                     $registro_venta_multiple = VentaController::registrar_venta_multiple($this->record, $data, $this->record->detalles->toArray());
                     if ($registro_venta_multiple['success'] == true) {
                         Notification::make()
@@ -265,8 +265,8 @@ class EditPedido extends EditRecord
                             ->send();
                     }
                 }
-                
-                
+
+
 
 
             })

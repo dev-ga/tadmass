@@ -21,6 +21,8 @@ class AlmacenResource extends Resource
 {
     protected static ?string $model = Almacen::class;
 
+    protected static ?string $navigationLabel = 'Almacenes';
+
     protected static ?string $navigationIcon = 'heroicon-c-building-library';
 
     public static function form(Form $form): Form
@@ -35,7 +37,7 @@ class AlmacenResource extends Resource
                     Grid::make()
                         ->schema([
                             Forms\Components\TextInput::make('codigo')
-                                ->label('Codigo')
+                                ->label('Código')
                                 ->prefixIcon('heroicon-c-clipboard-document-list')
                                 ->required()
                                 ->default('TADMASS-A-' . rand(111111, 999999))
@@ -49,23 +51,23 @@ class AlmacenResource extends Resource
 
                     Forms\Components\TextInput::make('nombre')
                         ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Nombre de Almacen')
+                        ->label('Nombre de Almacén')
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('direccion')
                         ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Direccion del Almacen')
+                        ->label('Dirección del Almacén')
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('telefono')
                         ->prefixIcon('heroicon-m-phone')
-                        ->label('Telefono')
+                        ->label('Teléfono')
                         ->tel()
                         ->required()
                         ->maxLength(255),
                     Select::make('tipo_almacen')
                         ->prefixIcon('heroicon-m-numbered-list')
-                        ->label('Tipo de almacen')
+                        ->label('Tipo de Almacén')
                         ->options([
                             'mayor' => 'Mayorista',
                             'detal' => 'Detal',
@@ -87,16 +89,20 @@ class AlmacenResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
+                    ->label('Código')
                     ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tipo_almacen')
+                    ->label('Tipo de Almacén')
                     ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('direccion')
+                    ->label('Dirección del Almacén')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('telefono')
+                    ->label('Teléfono')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('registrado_por')
                     ->searchable(),

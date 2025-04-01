@@ -24,6 +24,7 @@ class ProductoResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('codigo')
+                    ->label('Código')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('nombre')
@@ -90,6 +91,7 @@ class ProductoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
+                    ->label('Código')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nombre')
                     ->searchable(),

@@ -21,6 +21,8 @@ class ProveedorResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-s-truck';
 
+    protected static ?string $navigationLabel = 'Proveedores';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -32,7 +34,7 @@ class ProveedorResource extends Resource
                     Grid::make()
                         ->schema([
                             Forms\Components\TextInput::make('codigo')
-                                ->label('Codigo')
+                                ->label('Código')
                                 ->prefixIcon('heroicon-c-clipboard-document-list')
                                 ->required()
                                 ->default('TADMASS-P-' . rand(111111, 999999))
@@ -47,6 +49,7 @@ class ProveedorResource extends Resource
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('ci_rif')
+                        ->label('CI/RIF')
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('email')
@@ -54,9 +57,11 @@ class ProveedorResource extends Resource
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('direccion')
+                        ->label('Dirección')
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('telefono')
+                        ->label('Teléfono')
                         ->tel()
                         ->required()
                         ->maxLength(255),
@@ -66,7 +71,7 @@ class ProveedorResource extends Resource
                         ->default(Auth::user()->name)
                         ->disabled()
                         ->dehydrated()
-                    
+
                 ])->columns(3),
             ]);
     }
@@ -76,17 +81,21 @@ class ProveedorResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
+                    ->label('Código')
                     ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('ci_rif')
+                    ->label('CI/RIF')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('direccion')
+                    ->label('Dirección')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('telefono')
+                    ->label('Teléfono')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('registrado_por')
                     ->searchable(),

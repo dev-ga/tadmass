@@ -39,7 +39,7 @@ class GastoResource extends Resource
                         Grid::make()
                             ->schema([
                                 Forms\Components\TextInput::make('codigo')
-                                    ->label('Codigo')
+                                    ->label('Código')
                                     ->prefixIcon('heroicon-c-clipboard-document-list')
                                     ->required()
                                     ->default('TADMASS-G-' . rand(111111, 999999))
@@ -50,7 +50,7 @@ class GastoResource extends Resource
                                     ->maxLength(255),
 
                             ])->columns(4),
-                            
+
                         Forms\Components\TextInput::make('nro_control')
                             ->label('Nro. de Control')
                             ->prefixIcon('heroicon-c-clipboard-document-list')
@@ -109,7 +109,7 @@ class GastoResource extends Resource
 
                         Forms\Components\Select::make('metodo_pago')
                             ->prefixIcon('heroicon-m-numbered-list')
-                            ->label('Metodo de Pago')
+                            ->label('Método de Pago')
                             ->required()
                             ->options(function (Get $get) {
                                 if ($get('forma_pago') == 'dolares') {
@@ -262,12 +262,15 @@ class GastoResource extends Resource
                 Tables\Columns\TextColumn::make('nro_gasto')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('codigo')
+                    ->label('Código')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('descripcion')
+                    ->label('Descripción')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tipo_gasto')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('numero_factura')
+                    ->label('Número de Factura')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nro_control')
                     ->searchable(),
@@ -279,23 +282,30 @@ class GastoResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('metodo_pago')
+                    ->label('Metodo de pago')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tasa_bcv')
+                    ->label('Tasa BCV')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('monto_usd')
+                    ->label('Monto USD')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('monto_bsd')
+                    ->label('Monto Bs.')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('iva')
+                    ->label('IVA')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_gasto_bsd')
+                    ->label('Total gastos Bs.')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('conversion_usd')
+                    ->label('Conversión USD')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('registrado_por')

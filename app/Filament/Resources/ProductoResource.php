@@ -52,7 +52,7 @@ class ProductoResource extends Resource
                                 ]),
 
                         ])->columns(2),
-                    
+
                     //Tipo de venta
                     Section::make()
                         ->schema([
@@ -61,7 +61,7 @@ class ProductoResource extends Resource
                                     'mayor' => 'Al Mayor',
                                     'detal' => 'Por Unidad',
                                 ])
-                            
+
                         ])
                         ->afterStateUpdated(function (Get $get, $set) {
                             if ($get('tipo_venta') == 'mayor') {
@@ -80,7 +80,7 @@ class ProductoResource extends Resource
                     Section::make()
                         ->schema([
                             Forms\Components\TextInput::make('codigo')
-                                ->label('Codigo de Registro')
+                                ->label('Código de Registro')
                                 ->prefixIcon('heroicon-c-clipboard-document-list')
                                 ->required()
                                 ->live()
@@ -95,13 +95,13 @@ class ProductoResource extends Resource
                                 ->required()
                                 ->maxLength(255),
                             Forms\Components\TextInput::make('descripcion')
-                                ->label('Descripcion')
+                                ->label('Descripción')
                                 ->prefixIcon('heroicon-c-clipboard-document-list')
                                 ->required()
                                 ->maxLength(255),
                             //select categorias
                             Forms\Components\Select::make('categoria_id')
-                                ->label('Categoria')
+                                ->label('Categoría')
                                 ->prefixIcon('heroicon-c-clipboard-document-list')
                                 ->required()
                                 ->options(Categoria::all()->pluck('nombre', 'id'))
@@ -132,7 +132,7 @@ class ProductoResource extends Resource
 
                             //Vental Detal
                             //-------------------------------------------------------
-                    
+
                             Forms\Components\TextInput::make('precio_venta')
                                 ->prefixIcon('heroicon-c-clipboard-document-list')
                                 ->label('Precio Venta(Detal)')
@@ -186,7 +186,7 @@ class ProductoResource extends Resource
                                 ->disabled()
                                 ->dehydrated()
                                 ->maxLength(255),
-                                    
+
                         ])
                         ->hidden(function (Get $get) {
                             return $get('tipo_venta') == false;
@@ -194,7 +194,7 @@ class ProductoResource extends Resource
                         ->columns(3),
 
                 ])->columns(2),
-                
+
             Section::make('ENTRADA DE INVENTARIO')
                 ->description('Informacion para el registro de la Entrada de Inventario. Campos Requeridos(*)')
                 ->icon('heroicon-m-list-bullet')
@@ -209,7 +209,7 @@ class ProductoResource extends Resource
                             if ($get('tipo_venta') == 'mayor') {
                                 return 'Existencia en Bultos';
                             }
-                            
+
                             return;
                         })
                         ->prefixIcon('heroicon-c-clipboard-document-list')
@@ -235,13 +235,16 @@ class ProductoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
-                    ->badge()   
+                    ->label('Código')
+                    ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('descripcion')
+                    ->label('Descripción')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('categoria.nombre')
+                    ->label('Categoría')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('imagen')
                     ->searchable()

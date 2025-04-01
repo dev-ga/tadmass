@@ -29,6 +29,11 @@ use App\Filament\Resources\PedidoResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PedidoResource\RelationManagers;
 
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
+use Filament\Support\Enums\MaxWidth;
+
+
 class PedidoResource extends Resource
 {
     protected static ?string $model = Pedido::class;
@@ -40,13 +45,13 @@ class PedidoResource extends Resource
         $products = Producto::get();
         return $form
             ->schema([
-                
+
                 Section::make()
                     ->schema([
                         Grid::make()
                             ->schema([
                                 Forms\Components\TextInput::make('codigo')
-                                    ->label('Codigo')
+                                    ->label('Código')
                                     ->prefixIcon('heroicon-c-clipboard-document-list')
                                     ->required()
                                     ->default('TADMASS-PED-' . rand(111111, 999999))
@@ -77,80 +82,169 @@ class PedidoResource extends Resource
                             ->disabled()
                             ->dehydrated()
                             ->searchable(),
-                            
+
                         Forms\Components\TextInput::make('registrado_por')
                             ->prefixIcon('heroicon-s-shield-check')
                             ->default(Auth::user()->name)
                             ->disabled()
                             ->dehydrated()
                             ->maxLength(255),
-                        
+
                     ])->columnSpan('full')->columns(3),
 
                 Section::make()
                     ->schema([
                         // Repeatable field for invoice items
-                        Forms\Components\Repeater::make('productos')
-                            // Defined as a relationship to the InvoiceProduct model
-                            ->relationship('detalles')
-                            ->schema([
+                        // Forms\Components\Repeater::make('productos')
+                        //     // Defined as a relationship to the InvoiceProduct model
+                        //     ->relationship('detalles')
+                        //     ->schema([
 
-                                Forms\Components\Select::make('producto_id')
-                                    ->relationship('productos', 'nombre')
-                                    // Options are all products, but we have modified the display to show the price as well
-                                    ->options(
-                                        // Producto::all()->pluck('nombre', 'id')
-                                        $products->mapWithKeys(function (Producto $product) {
-                                            return [$product->id => sprintf('%s ($%s)', $product->nombre, $product->precio_venta)];
-                                        })
-                                    )
-                                    // Disable options that are already selected in other rows
-                                    ->disableOptionWhen(function ($value, $state, Get $get) {
-                                        return collect($get('../*.producto_id'))
-                                            ->reject(fn($id) => $id == $state)
-                                            ->filter()
-                                            ->contains($value);
+                        //         Forms\Components\Select::make('producto_id')
+                        //             ->relationship('productos', 'nombre')
+                        //             // Options are all products, but we have modified the display to show the price as well
+                        //             ->options(
+                        //                 // Producto::all()->pluck('nombre', 'id')
+                        //                 $products->mapWithKeys(function (Producto $product) {
+                        //                     return [$product->id => sprintf('%s ($%s)', $product->nombre, $product->precio_venta)];
+                        //                 })
+                        //             )
+                        //             // Disable options that are already selected in other rows
+                        //             ->disableOptionWhen(function ($value, $state, Get $get) {
+                        //                 return collect($get('../*.producto_id'))
+                        //                     ->reject(fn($id) => $id == $state)
+                        //                     ->filter()
+                        //                     ->contains($value);
+                        //             })
+                        //             ->afterStateUpdated(function (Get $get, Set $set,) {
+                        //                 //actualizamos el precio de venta
+                        //                 $set('precio_venta', Producto::find($get('producto_id'))->precio_venta);
+                        //             })
+                        //             ->live()
+                        //             ->required()
+                        //             ->validationMessages([
+                        //                 'required' => 'Debe seleccionar un producto',
+                        //             ]),
+                        //         Forms\Components\TextInput::make('cantidad')
+                        //             ->label('Cantidad')
+                        //             ->integer()
+                        //             ->default(1)
+                        //             ->required(),
+                        //         Forms\Components\TextInput::make('precio_venta')
+                        //             ->label('Precio de venta($)')
+                        //             ->prefix('US$')
+                        //             ->placeholder('0.00')
+                        //             ->numeric()
+                        //             ->disabled()
+                        //             ->dehydrated()
+                        //             ->required(),
+
+                        //     ])
+                        //     // Repeatable field is live so that it will trigger the state update on each change
+                        //     ->live()
+                        //     // After adding a new row, we need to update the totals
+                        //     ->afterStateUpdated(function (Get $get, Set $set,) {
+                        //         self::updateTotals($get, $set);
+                        //     })
+                        //     // After deleting a row, we need to update the totals
+                        //     ->deleteAction(
+                        //         fn(Action $action) => $action->after(fn(Get $get, Set $set) => self::updateTotals($get, $set)),
+                        //     )
+                        //     // Disable reordering
+                        //     ->reorderable(false)
+                        //     ->columns(3)
+                        TableRepeater::make('productos')
+                        ->headers([
+                            Header::make('Producto'),
+                            Header::make('Precio Unitario($)')->width('155px'),
+                            Header::make('Cantidad')->width('80px'),
+                            Header::make('Precio de venta($)')->width('155px'),
+                        ])
+                        // Repeatable field is live so that it will trigger the state update on each change
+                        ->live()
+                        // After adding a new row, we need to update the totals
+                        ->afterStateUpdated(function (Get $get, Set $set,) {
+                            self::updateTotals($get, $set);
+                        })
+                        // After deleting a row, we need to update the totals
+                        ->deleteAction(
+                            fn(Action $action) => $action->after(fn(Get $get, Set $set) => self::updateTotals($get, $set)),
+                        )
+                        ->schema([
+                            Forms\Components\Select::make('producto_id')
+                                ->relationship('productos', 'nombre')
+                                // Options are all products, but we have modified the display to show the price as well
+                                // ->options(
+                                //     // Producto::all()->pluck('nombre', 'id')
+                                //     $products->mapWithKeys(function (Producto $product) {
+                                //         return [$product->id => sprintf('%s ($%s)', $product->nombre, $product->precio_venta)];
+                                //     })
+                                // )
+                                ->options(
+                                    $products->mapWithKeys(function (Producto $product) {
+                                        return [
+                                            $product->id => '
+                                                <div>
+                                                    <div style="font-weight: bold;">' . e($product->nombre) . '</div>
+                                                    <div style="font-size: 12px; color: #6b7280; text-transform: capitalize;">Tipo de venta: ' . e($product->tipo_venta) . '</div>
+                                                </div>'
+                                        ];
                                     })
-                                    ->afterStateUpdated(function (Get $get, Set $set,) {
-                                        //actualizamos el precio de venta
-                                        $set('precio_venta', Producto::find($get('producto_id'))->precio_venta);
-                                    })
-                                    ->live()
-                                    ->required()
-                                    ->validationMessages([
-                                        'required' => 'Debe seleccionar un producto',
-                                    ]),
-                                Forms\Components\TextInput::make('cantidad')
-                                    ->label('Cantidad')
-                                    ->integer()
-                                    ->default(1)
-                                    ->required(),
-                                Forms\Components\TextInput::make('precio_venta')
-                                    ->label('Precio de venta($)')
-                                    ->prefix('US$')
-                                    ->placeholder('0.00')
-                                    ->numeric()
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->required(),
-                                    
-                            ])
-                            // Repeatable field is live so that it will trigger the state update on each change
-                            ->live()
-                            // After adding a new row, we need to update the totals
-                            ->afterStateUpdated(function (Get $get, Set $set,) {
-                                self::updateTotals($get, $set);
-                            })
-                            // After deleting a row, we need to update the totals
-                            ->deleteAction(
-                                fn(Action $action) => $action->after(fn(Get $get, Set $set) => self::updateTotals($get, $set)),
-                            )
-                            // Disable reordering
-                            ->reorderable(false)
-                            ->columns(3)
+                                )
+                                ->native(false) // usa el select estilizado de Filament
+                                ->allowHtml()
+                                // Disable options that are already selected in other rows
+                                ->disableOptionWhen(function ($value, $state, Get $get) {
+                                    return collect($get('../*.producto_id'))
+                                        ->reject(fn($id) => $id == $state)
+                                        ->filter()
+                                        ->contains($value);
+                                })
+                                ->afterStateUpdated(function (Get $get, Set $set,) {
+                                    //actualizamos el precio de venta
+                                    $set('precio_venta', Producto::find($get('producto_id'))->precio_venta);
+                                    // $set('subtotal_venta', Producto::find($get('producto_id'))->precio_venta * $get('cantidad'));
+                                })
+                                ->live()
+                                ->required()
+                                ->validationMessages([
+                                    'required' => 'Debe seleccionar un producto',
+                                ]),
+                            Forms\Components\TextInput::make('precio_venta')
+                                ->label('Precio de venta($)')
+                                ->prefix('US$')
+                                ->placeholder('0.00')
+                                ->numeric()
+                                ->disabled()
+                                ->dehydrated()
+                                ->required(),
+                            Forms\Components\TextInput::make('cantidad')
+                                ->label('Cantidad')
+                                ->integer()
+                                ->default(0)
+                                ->afterStateUpdated(function (Get $get, Set $set,) {
+                                    //actualizamos el precio de venta
+                                    $set('subtotal_venta', Producto::find($get('producto_id'))->precio_venta * $get('cantidad'));
+                                })
+                                ->required(),
+                            Forms\Components\TextInput::make('subtotal_venta')
+                                ->label('Precio de venta($)')
+                                ->prefix('US$')
+                                ->placeholder('0.00')
+                                ->numeric()
+                                ->disabled()
+                                ->dehydrated()
+                                ->required(),
+
+                        ])
+                        // Disable reordering
+                        ->reorderable(false)
+                        ->relationship('detalles')
+                        ->stackAt(MaxWidth::Small)
+                        ->columns(3)
                     ])->columnSpan(2)->columns(1),
 
-                Section::make()    
+                Section::make()
                     ->schema([
                         Forms\Components\TextInput::make('monto_usd')
                             ->prefix('US$')
@@ -164,9 +258,9 @@ class PedidoResource extends Resource
                             ->required()
                             ->numeric()
                             ->default(0.00),
-                        
+
                     ])->columnSpan(1)->columns(1),
-                    
+
             ])->columns(3);
     }
 
@@ -175,6 +269,7 @@ class PedidoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
+                    ->label('Código')
                     ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('cliente.nombre')
@@ -198,7 +293,7 @@ class PedidoResource extends Resource
                     })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('monto_usd')
-                    ->label('Monto USD($)')     
+                    ->label('Monto USD($)')
                     ->numeric()
                     ->money('USD')
                     ->badge()
@@ -261,12 +356,12 @@ class PedidoResource extends Resource
             $product['precio_venta'] = $prices[$product['producto_id']] ?? 0;
             return $subtotal + ($prices[$product['producto_id']] * $product['cantidad']);
         }, 0);
-          
+
         // Update the state with the new values
         $set('subtotal', number_format($subtotal, 2, '.', ''));
         $set('monto_usd', number_format($subtotal, 2, '.', ''));
         $set('monto_bsd', number_format($subtotal * $parametro->tasa_bcv, 2, '.', ''));
-    
+
     }
 
     public static function getNavigationGroup(): ?string

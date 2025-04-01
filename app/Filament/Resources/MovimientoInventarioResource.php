@@ -32,6 +32,7 @@ class MovimientoInventarioResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('codigo_producto')
+                    ->label('Código producto')
                     ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('producto.nombre')

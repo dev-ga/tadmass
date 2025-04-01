@@ -64,7 +64,7 @@ class VentaResource extends Resource
     //                         ->dehydrated()
     //                         ->maxLength(255),
     //                 ])->columnSpan('full')->columns(3),
-                
+
     //             Section::make()
     //                 ->schema([
     //                     // Repeatable field for invoice items
@@ -72,7 +72,7 @@ class VentaResource extends Resource
     //                         // Defined as a relationship to the InvoiceProduct model
     //                         ->relationship('detalles')
     //                         ->schema([
-                                
+
     //                             Forms\Components\Select::make('producto_id')
     //                                 ->relationship('productos', 'nombre')
     //                                 // Options are all products, but we have modified the display to show the price as well
@@ -95,7 +95,7 @@ class VentaResource extends Resource
     //                                     $set('precio_venta', Producto::find($get('producto_id'))->precio_venta);
     //                                 })
     //                                 ->live(),
-                                    
+
     //                             Forms\Components\TextInput::make('cantidad')
     //                                 ->integer()
     //                                 ->default(1)
@@ -122,12 +122,12 @@ class VentaResource extends Resource
     //                         // Disable reordering
     //                         ->reorderable(false)
     //                         ->columns(3)
-                            
+
     //                 ])->columnSpan(2)->columns(1),
 
     //             Section::make()
     //                 ->schema([
-                        
+
     //                     Grid::make()
     //                         ->schema([
     //                             Forms\Components\TextInput::make('subtotal')
@@ -150,9 +150,9 @@ class VentaResource extends Resource
     //                                 ->afterStateUpdated(function (Get $get, Set $set) {
     //                                     self::updateTotals($get, $set);
     //                                 })
-                                
+
     //                         ])->columns(2),
-                            
+
     //                     Grid::make()
     //                         ->schema([
     //                             Forms\Components\TextInput::make('total_usd')
@@ -167,9 +167,9 @@ class VentaResource extends Resource
     //                                 // Read-only, because it's calculated
     //                                 ->readOnly()
     //                                 ->prefix('Bs.'),
-                                
+
     //                         ])->columns(2),
-                            
+
     //                     ToggleButtons::make('metodo_pago')
     //                         ->label('Metodo de Pago')
     //                         ->options([
@@ -199,7 +199,7 @@ class VentaResource extends Resource
     //                                 })
     //                                 ->live(true)
     //                                 ->prefix('$'),
-                                    
+
     //                             Forms\Components\TextInput::make('monto_bsd')
     //                                 ->label('Monto(Bs.)')
     //                                 ->numeric()
@@ -210,11 +210,11 @@ class VentaResource extends Resource
     //                         ])
     //                         ->hidden(fn (Get $get) => $get('metodo_pago') != 'multiple')
     //                         ->columns(2),
-                        
+
     //                 ])->columnSpan(1)->columns(1),
-                    
+
     //         ])->columns(3);
-            
+
     // }
 
     public static function table(Table $table): Table
@@ -222,6 +222,7 @@ class VentaResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
+                    ->label('Código')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('cliente.id')
                     ->searchable(),
@@ -230,23 +231,29 @@ class VentaResource extends Resource
                 Tables\Columns\TextColumn::make('fecha')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('metodo_pago')
+                    ->label('Método de Pago')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('monto_usd')
+                    ->label('Monto USD')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('monto_bsd')
+                    ->label('Monto Bs.')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('totaL_venta')
+                Tables\Columns\TextColumn::make('total_venta')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tasa_bcv')
+                    ->label('Tasa BCV')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('comision_usd')
+                    ->label('Comisión USD')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('comision_bsd')
+                    ->label('Comisión Bs.')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('registrado_por')
@@ -298,9 +305,9 @@ class VentaResource extends Resource
     {
 
         $parametro = Configuracion::first();
-        
+
         // Retrieve all selected products and remove empty rows
-        $selectedProducts = collect($get('productos'))->filter(fn($item) => !empty($item['producto_id']) && !empty($item['cantidad'])); 
+        $selectedProducts = collect($get('productos'))->filter(fn($item) => !empty($item['producto_id']) && !empty($item['cantidad']));
 
         // Retrieve prices for all selected products
         $prices = Producto::find($selectedProducts->pluck('producto_id'))->pluck('precio_venta', 'id');

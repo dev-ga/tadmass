@@ -41,7 +41,7 @@ class InventarioResource extends Resource
     //                             ->prefixIcon('heroicon-c-clipboard-document-list')
     //                             ->relationship('producto', 'nombre')
     //                             ->required(),
-                       
+
     //                         Forms\Components\TextInput::make('categoria_id')
     //                             ->label('Categoria')
     //                             ->prefixIcon('heroicon-c-clipboard-document-list')
@@ -81,11 +81,13 @@ class InventarioResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
-                ->badge()
-                ->searchable(),
+                    ->label('Código')
+                    ->badge()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('producto.nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('almacen.nombre')
+                    ->label('Almacén')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('existencia')
                     ->numeric()
@@ -137,8 +139,8 @@ class InventarioResource extends Resource
                         $mover_existencia = MovimientoInventarioController::mover_existencia($records, $data);
 
                     })
-                    
-                    
+
+
                 ]),
             ]);
     }

@@ -36,7 +36,7 @@ class CategoriaResource extends Resource
                     Grid::make()
                         ->schema([
                             Forms\Components\TextInput::make('codigo')
-                                ->label('Codigo')
+                                ->label('Código')
                                 ->prefixIcon('heroicon-c-clipboard-document-list')
                                 ->required()
                                 ->default('TADMASS-C-' . rand(111111, 999999))
@@ -45,32 +45,32 @@ class CategoriaResource extends Resource
                                 ->unique()
                                 ->dehydrated()
                                 ->maxLength(255),
-                        
+
                     ])->columns(4),
-                        
+
                     Forms\Components\TextInput::make('nombre')
                         ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Nombre de categoria')
+                        ->label('Nombre de categoría')
                         ->required()
                         ->live(onBlur: true)
                         ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state)))
                         ->maxLength(255),
-                        
+
                     Forms\Components\TextInput::make('slug')
                         ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Slug de categoria')
+                        ->label('Slug de categoría')
                         ->disabled()
                         ->dehydrated()
                         ->maxLength(255),
-                        
+
                     Forms\Components\TextInput::make('comision')
                         ->prefixIcon('heroicon-c-clipboard-document-list')
-                        ->label('Comision de categoria(%)')
+                        ->label('Comision de categoría(%)')
                         ->hint('Separador decimal con punto(.)')
                         ->helperText('Este porcentaje sera aplicado sobre el precio de venta del producto y sera asignado al vendedor')
                         ->numeric()
                         ->required(),
-                        
+
                     Forms\Components\TextInput::make('registrado_por')
                         ->prefixIcon('heroicon-s-shield-check')
                         ->default(Auth::user()->name)
@@ -86,6 +86,7 @@ class CategoriaResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
+                    ->label('Código')
                     ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nombre')
@@ -93,6 +94,7 @@ class CategoriaResource extends Resource
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('comision')
+                    ->label('Comisión')
                     ->badge()
                     ->color('success')
                     ->icon('heroicon-c-receipt-percent')
