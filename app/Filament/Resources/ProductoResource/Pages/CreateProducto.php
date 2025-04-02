@@ -14,14 +14,6 @@ class CreateProducto extends CreateRecord
 {
     protected static string $resource = ProductoResource::class;
     
-    // protected function getHeaderActions(): array
-    // {
-    //     return [
-    //         Actions\ViewAction::make(),
-    //         Actions\CreateAction::make(),
-    //     ];
-    // }
-    
     //aftercreate
     protected function afterCreate(): void
     {
