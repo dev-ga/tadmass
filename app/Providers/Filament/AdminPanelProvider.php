@@ -18,11 +18,48 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use ReflectionClass;
+
+use Filament\Tables\View\TablesRenderHook as ViewTablesRenderHook;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Str;
 
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        // $panelHooks = new ReflectionClass(PanelsRenderHook::class);
+        // // Table Hooks
+        // $tableHooks = new ReflectionClass(ViewTablesRenderHook::class);
+        // // Widget Hooks
+        // $widgetHooks = new ReflectionClass(Widgets\View\WidgetsRenderHook::class);
+
+        // $panelHooks = $panelHooks->getConstants();
+        // $tableHooks = $tableHooks->getConstants();
+        // $widgetHooks = $widgetHooks->getConstants();
+
+        // foreach ($panelHooks as $hook) {
+        //     $panel->renderHook($hook, function () use ($hook) {
+        //         return Blade::render('<div style="border: solid red 1px; padding: 2px;">{{ $name }}</div>', [
+        //             'name' => Str::of($hook)->remove('tables::'),
+        //         ]);
+        //     });
+        // }
+        // foreach ($tableHooks as $hook) {
+        //     $panel->renderHook($hook, function () use ($hook) {
+        //         return Blade::render('<div style="border: solid red 1px; padding: 2px;">{{ $name }}</div>', [
+        //             'name' => Str::of($hook)->remove('tables::'),
+        //         ]);
+        //     });
+        // }
+        // foreach ($widgetHooks as $hook) {
+        //     $panel->renderHook($hook, function () use ($hook) {
+        //         return Blade::render('<div style="border: solid red 1px; padding: 2px;">{{ $name }}</div>', [
+        //             'name' => Str::of($hook)->remove('tables::'),
+        //         ]);
+        //     });
+        // }
+
         return $panel
             ->default()
             ->id('admin')
