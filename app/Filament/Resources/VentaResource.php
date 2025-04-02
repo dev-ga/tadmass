@@ -27,6 +27,8 @@ class VentaResource extends Resource
 {
     protected static ?string $model = Venta::class;
 
+    protected static ?string $navigationLabel = 'Ingresos - Ventas';
+
     protected static ?string $navigationIcon = 'heroicon-c-presentation-chart-line';
 
     // public static function form(Form $form): Form
@@ -298,7 +300,7 @@ class VentaResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Contabilidad';
+        return 'Contable';
     }
 
     public static function updateTotals(Get $get, Set $set): void

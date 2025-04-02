@@ -366,7 +366,7 @@ class PedidoResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Administración';
+        return 'Ventas';
     }
 
     public static function updateMontos(Get $get, Set $set): void

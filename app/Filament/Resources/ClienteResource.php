@@ -146,6 +146,6 @@ class ClienteResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Administración';
+        return 'Comercial y Clientes';
     }
 }

@@ -28,6 +28,8 @@ class GastoResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-m-credit-card';
 
+    protected static ?string $navigationLabel = 'Egresos - Compras';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -379,6 +381,6 @@ class GastoResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Contabilidad';
+        return 'Contable';
     }
 }

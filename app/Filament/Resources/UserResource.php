@@ -23,7 +23,7 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-   
+
             Forms\Components\Section::make('USUARIOS TADMASS')
                 ->description('Formulario de registro de usuarios. Campos Requeridos(*)')
                 ->icon('heroicon-s-user-circle')
@@ -102,6 +102,6 @@ class UserResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Seguridad';
+        return 'Configuración';
     }
 }

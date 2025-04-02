@@ -226,6 +226,6 @@ class ConfiguracionResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Seguridad';
+        return 'Configuración';
     }
 }

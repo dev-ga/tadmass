@@ -141,6 +141,6 @@ class CategoriaResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Administración';
+        return 'Productos y Abastecimiento';
     }
 }
