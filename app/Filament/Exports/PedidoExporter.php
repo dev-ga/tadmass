@@ -22,8 +22,7 @@ class PedidoExporter extends Exporter
     {
         return [
             ExportColumn::make('codigo')
-                ->label('Codigo')
-                ->getXlsxCellStyle(fn (ExportColumn $column, Row $row, int $index) => $column->getXlsxHeaderCellStyle()),
+                ->label('Codigo'),
             ExportColumn::make('cliente.nombre')
                 ->label('Cliente'),
             ExportColumn::make('vendedor.nombre')
