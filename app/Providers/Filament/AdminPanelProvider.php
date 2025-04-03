@@ -21,6 +21,7 @@ use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use ReflectionClass;
 
 use Filament\Tables\View\TablesRenderHook as ViewTablesRenderHook;
+use Filament\Support\Facades\FilamentView;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Str;
 
@@ -102,13 +103,22 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::TOPBAR_END, function () {
                 return view('topbar-end-bcv');
             })
-            ->renderHook(PanelsRenderHook::PAGE_HEADER_WIDGETS_BEFORE, function () {
-                return view('bcv');
-            })
+            // ->renderHook(PanelsRenderHook::PAGE_HEADER_WIDGETS_BEFORE, function () {
+            //     return view('bcv');
+            // })
             ->sidebarFullyCollapsibleOnDesktop()
             ->brandLogo(asset('images/tadmasLogo.png'))
             ->darkModeBrandLogo(asset('images/tadmasLogoWhite.png'))
             ->brandLogoHeight('3.5rem')
             ->databaseNotifications();
+    }
+
+    public function boot(): void
+    {
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::PAGE_HEADER_WIDGETS_BEFORE,
+            fn () => view('bcv'),
+            scopes: Pages\Dashboard::class,
+        );
     }
 }
