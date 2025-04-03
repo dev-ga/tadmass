@@ -65,4 +65,14 @@ class Venta extends Model
     {
         return $this->hasMany(Producto::class);
     }
+
+    /**
+     * Get all of the comments for the Venta
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function pagoDetalles(): HasMany
+    {
+        return $this->hasMany(PagoDetalle::class, 'venta_id', 'id');
+    }
 }

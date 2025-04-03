@@ -102,12 +102,11 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::TOPBAR_END, function () {
                 return view('topbar-end-bcv');
             })
-            ->renderHook(PanelsRenderHook::PAGE_HEADER_WIDGETS_BEFORE, function () {
-                return view('bcv');
-            })
+            ->databaseTransactions()
             ->sidebarFullyCollapsibleOnDesktop()
             ->brandLogo(asset('images/tadmasLogo.png'))
             ->darkModeBrandLogo(asset('images/tadmasLogoWhite.png'))
-            ->brandLogoHeight('3.5rem');
+            ->brandLogoHeight('3.5rem')
+            ->databaseNotifications();
     }
 }

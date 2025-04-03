@@ -15,23 +15,29 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Configuracion;
 use Filament\Resources\Resource;
+use Awcodes\TableRepeater\Header;
 use Illuminate\Support\Collection;
 use Filament\Forms\Components\Grid;
 use Illuminate\Support\Facades\Log;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
+use App\Filament\Exports\PedidoExporter;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
+use App\Http\Controllers\VentaController;
+
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\Actions\Action;
 use App\Filament\Resources\PedidoResource\Pages;
+use Awcodes\TableRepeater\Components\TableRepeater;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PedidoResource\RelationManagers;
 
-use Awcodes\TableRepeater\Components\TableRepeater;
-use Awcodes\TableRepeater\Header;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Actions\Exports\Enums\ExportFormat;
 
 
 class PedidoResource extends Resource
@@ -72,6 +78,7 @@ class PedidoResource extends Resource
                                 'required' => 'Debe seleccionar un cliente',
                             ])
                             ->searchable(),
+                            
                         Select::make('vendedor_id')
                             ->prefixIcon('heroicon-c-list-bullet')
                             ->label('Vendedor')
@@ -94,65 +101,6 @@ class PedidoResource extends Resource
 
                 Section::make()
                     ->schema([
-                        // Repeatable field for invoice items
-                        // Forms\Components\Repeater::make('productos')
-                        //     // Defined as a relationship to the InvoiceProduct model
-                        //     ->relationship('detalles')
-                        //     ->schema([
-
-                        //         Forms\Components\Select::make('producto_id')
-                        //             ->relationship('productos', 'nombre')
-                        //             // Options are all products, but we have modified the display to show the price as well
-                        //             ->options(
-                        //                 // Producto::all()->pluck('nombre', 'id')
-                        //                 $products->mapWithKeys(function (Producto $product) {
-                        //                     return [$product->id => sprintf('%s ($%s)', $product->nombre, $product->precio_venta)];
-                        //                 })
-                        //             )
-                        //             // Disable options that are already selected in other rows
-                        //             ->disableOptionWhen(function ($value, $state, Get $get) {
-                        //                 return collect($get('../*.producto_id'))
-                        //                     ->reject(fn($id) => $id == $state)
-                        //                     ->filter()
-                        //                     ->contains($value);
-                        //             })
-                        //             ->afterStateUpdated(function (Get $get, Set $set,) {
-                        //                 //actualizamos el precio de venta
-                        //                 $set('precio_venta', Producto::find($get('producto_id'))->precio_venta);
-                        //             })
-                        //             ->live()
-                        //             ->required()
-                        //             ->validationMessages([
-                        //                 'required' => 'Debe seleccionar un producto',
-                        //             ]),
-                        //         Forms\Components\TextInput::make('cantidad')
-                        //             ->label('Cantidad')
-                        //             ->integer()
-                        //             ->default(1)
-                        //             ->required(),
-                        //         Forms\Components\TextInput::make('precio_venta')
-                        //             ->label('Precio de venta($)')
-                        //             ->prefix('US$')
-                        //             ->placeholder('0.00')
-                        //             ->numeric()
-                        //             ->disabled()
-                        //             ->dehydrated()
-                        //             ->required(),
-
-                        //     ])
-                        //     // Repeatable field is live so that it will trigger the state update on each change
-                        //     ->live()
-                        //     // After adding a new row, we need to update the totals
-                        //     ->afterStateUpdated(function (Get $get, Set $set,) {
-                        //         self::updateTotals($get, $set);
-                        //     })
-                        //     // After deleting a row, we need to update the totals
-                        //     ->deleteAction(
-                        //         fn(Action $action) => $action->after(fn(Get $get, Set $set) => self::updateTotals($get, $set)),
-                        //     )
-                        //     // Disable reordering
-                        //     ->reorderable(false)
-                        //     ->columns(3)
                         TableRepeater::make('productos')
                         ->headers([
                             Header::make('Producto'),
@@ -173,13 +121,6 @@ class PedidoResource extends Resource
                         ->schema([
                             Forms\Components\Select::make('producto_id')
                                 ->relationship('productos', 'nombre')
-                                // Options are all products, but we have modified the display to show the price as well
-                                // ->options(
-                                //     // Producto::all()->pluck('nombre', 'id')
-                                //     $products->mapWithKeys(function (Producto $product) {
-                                //         return [$product->id => sprintf('%s ($%s)', $product->nombre, $product->precio_venta)];
-                                //     })
-                                // )
                                 ->options(
                                     $products->mapWithKeys(function (Producto $product) {
                                         return [
@@ -210,6 +151,7 @@ class PedidoResource extends Resource
                                 ->validationMessages([
                                     'required' => 'Debe seleccionar un producto',
                                 ]),
+                                
                             Forms\Components\TextInput::make('precio_venta')
                                 ->label('Precio de venta($)')
                                 ->prefix('US$')
@@ -227,6 +169,7 @@ class PedidoResource extends Resource
                                     $set('subtotal_venta', Producto::find($get('producto_id'))->precio_venta * $get('cantidad'));
                                 })
                                 ->required(),
+                                
                             Forms\Components\TextInput::make('subtotal_venta')
                                 ->label('Precio de venta($)')
                                 ->prefix('US$')
@@ -241,8 +184,22 @@ class PedidoResource extends Resource
                         ->reorderable(false)
                         ->relationship('detalles')
                         ->stackAt(MaxWidth::Small)
+                        ->addable(function ($record) {
+                            if(isset($record->status) && $record->status == 'procesado'){
+                                return false;
+                            }
+                            return true;
+                        })
+                        ->deletable(function ($record) {
+                            if (isset($record->status) && $record->status == 'procesado') {
+                                return false;
+                            }
+                            return true;
+                        })
                         ->columns(3)
-                    ])->columnSpan(2)->columns(1),
+                    ])
+                    ->columnSpan(2)
+                    ->columns(1),
 
                 Section::make()
                     ->schema([
@@ -287,8 +244,8 @@ class PedidoResource extends Resource
                     ->color(function (mixed $state): string {
                         return match ($state) {
                             'por-procesar' => 'warning',
-                            'procesado' => 'danger',
-                            default => 'success',
+                            'procesado' => 'success',
+                            default => 'info',
                         };
                     })
                     ->searchable(),
@@ -315,13 +272,415 @@ class PedidoResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->label('Ver Detalle')
+                        ->modalHeading('Detalle del Pedido')
+                        ->color('primary')
+                        ->modalWidth(MaxWidth::SixExtraLarge),
+                    
+                    Tables\Actions\EditAction::make()
+                        ->color('warning')
+                        ->label('Editar')
+                        ->hidden(fn($record) => $record->status == 'procesado'),
+                        
+                    Tables\Actions\Action::make("Ejecutar venta")
+                        ->form([
+                            //Totales
+                            //--------------------------------------------------
+                            Section::make('Totales del Pedido')
+                                ->schema([
+
+                                    TextInput::make('total_usd')
+                                        ->label('Total USD($)')
+                                        ->prefix('US$')
+                                        ->numeric()
+                                        ->disabled()
+                                        ->dehydrated()
+                                        ->default(function ($record) {
+                                            return $record->monto_usd ?? 0.00;
+                                        }),
+
+                                    TextInput::make('total_bsd')
+                                        ->label('Total VES(Bs.)')
+                                        ->prefix('Bs.')
+                                        ->numeric()
+                                        ->disabled()
+                                        ->dehydrated()
+                                        ->default(function ($record) {
+                                            return $record->monto_bsd ?? 0.00;
+                                        })
+                                ])->columns(2),
+                            //--------------------------------------------------
+
+                            //Metodo de Pago
+                            //--------------------------------------------------
+                            Section::make()
+                                ->schema([
+                                    
+                                    //Toggle para metodo de pago
+                                    //-------------------------------------------------------------
+                                    ToggleButtons::make('metodo_pago')
+                                        ->label('Método de Pago')
+                                        ->options([
+                                            'usd' => 'USD($)',
+                                            'bsd' => 'VES(Bs.)',
+                                            'multiple' => 'Multiple'
+                                        ])
+                                        ->afterStateUpdated(function (Get $get, Set $set) {
+                                            self::updateMontos($get, $set);
+                                        })
+                                        ->icons([
+                                            'usd' => 'heroicon-o-currency-dollar',
+                                            'bsd' => 'heroicon-m-banknotes',
+                                            'multiple' => 'heroicon-o-currency-dollar',
+                                        ])
+                                        ->live()
+                                        ->inline(),
+
+                                    //Input para formulario de pago en US$
+                                    //-------------------------------------------------------------
+                                    Grid::make(3)
+                                        ->schema([
+                                            TextInput::make('cash')
+                                                ->label('Efectivo($)')
+                                                ->prefix('$')
+                                                ->default(fn(Get $get) => $get('total_usd'))
+                                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                                    $total = $get('total_usd') - $get('cash');
+                                                    $set('zelle', $total);
+                                                })
+                                                ->live(true)
+                                                ->numeric()
+                                                ->hintAction(
+                                                    Action::make('reset')
+                                                        ->icon('heroicon-o-arrow-path')
+                                                        ->action(function (Set $set) {
+                                                            $set('zelle', null);
+                                                            $set('cash', null);
+                                                        })
+                                                ),
+                                            TextInput::make('zelle')
+                                                ->label('Transferencia(Zelle)')
+                                                ->prefix('Zelle')
+                                                ->placeholder('0.00')
+                                                ->live()
+                                                ->disabled()
+                                                ->dehydrated()
+                                                ->numeric(),
+                                            TextInput::make('ref_zelle')
+                                                ->label('Referencia(Zelle)')
+                                                ->prefix('#')
+                                                ->hidden(fn(Get $get) => $get('zelle') == null),
+                                        ])->hidden(fn(Get $get) => $get('metodo_pago') != 'usd'),
+                                    
+                                    //Toggle para tipo de pago en US$ y Bs.
+                                    //-------------------------------------------------------------
+                                    ToggleButtons::make('tipo_usd')
+                                        ->label('Tipo US$')
+                                        ->hidden(fn(Get $get) => $get('metodo_pago') != 'multiple')
+                                        ->options([
+                                            'cash'  => 'Efectivo USD($)',
+                                            'zelle' => 'Zelle USD($)',
+                                        ])
+                                        ->afterStateUpdated(function (Get $get, Set $set) {
+                                            self::updateMontos($get, $set);
+                                        })
+                                        ->icons([
+                                            'cash' => 'heroicon-o-currency-dollar',
+                                            'zelle' => 'heroicon-o-currency-dollar',
+                                        ])
+                                        ->live()
+                                        ->inline()
+                                        ->default('cash'),
+                                    Grid::make(3)
+                                        ->hidden(fn(Get $get) => $get('metodo_pago') != 'multiple')
+                                        ->schema([
+                                            TextInput::make('pago_usd')
+                                                ->label('Monto($)')
+                                                ->numeric()
+                                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                                    $total = $get('total_usd') - $get('pago_usd');
+                                                    $set('pago_bsd', round($total * Configuracion::first()->tasa_bcv, 2));
+                                                })
+                                                ->hintAction(
+                                                    Action::make('reset')
+                                                        ->icon('heroicon-o-arrow-path')
+                                                        ->action(function (Set $set) {
+                                                            $set('pago_usd', null);
+                                                            $set('pago_bsd', null);
+                                                        })
+                                                )
+                                                ->live(true)
+                                                ->placeholder('0.00')
+                                                ->prefix('US$'),
+                                            TextInput::make('ref_zelle')
+                                                ->label('Referencia(Zelle)')
+                                                ->prefix('#')
+                                                ->required(fn(Get $get) => $get('tipo_usd') == 'zelle')
+                                                ->disabled(function (Get $get) {
+                                                    if ($get('tipo_usd') == 'zelle') {
+                                                        return false;
+                                                    }
+                                                    return true;
+                                                })
+                                                ->hidden(fn(Get $get) => $get('metodo_pago') != 'bsd' && $get('metodo_pago') != 'multiple'),
+                                            
+                                        ]),
+
+                                    ToggleButtons::make('tipo_bsd')
+                                        ->multiple()
+                                        ->label('Tipo VES(Bs.)')
+                                        ->inline()
+                                        ->live()
+                                        ->options([
+                                            'pago-movil'    => 'Pago Movil',
+                                            'punto'         => 'Punto de Venta',
+                                            'transferencia' => 'Transferencia',
+                                        ])
+                                        ->icons([
+                                            'punto'         => 'heroicon-m-banknotes',
+                                            'pago-movil'    => 'heroicon-m-banknotes',
+                                            'transferencia' => 'heroicon-m-banknotes',
+                                        ])
+                                        ->hidden(fn(Get $get) => $get('metodo_pago') != 'bsd' && $get('metodo_pago') != 'multiple'),
+                                        
+                                        
+                                    //Input para pago en bsd
+                                    //-------------------------------------------------------------
+                                    Grid::make()
+                                        ->schema([
+                                            TextInput::make('pago_bsd')
+                                                ->label('Monto(Bs.)')
+                                                ->numeric()
+                                                // Read-only, because it's calculated
+                                                // ->readOnly()
+                                                ->disabled()
+                                                ->dehydrated()
+                                                ->placeholder('0.00')
+                                                ->prefix('Bs.'),
+                                        ])
+                                        ->hidden(fn(Get $get) => $get('metodo_pago') != 'multiple')
+                                        ->columns(3),
+                                    Grid::make(3)
+                                        ->schema([
+                                            TextInput::make('referencia_pagoMovil_bsd')
+                                                ->label('Ref: Pago Movil')
+                                                ->required(fn(Get $get) => in_array('pago-movil', $get('tipo_bsd')))
+                                                ->validationMessages([
+                                                    'required' => 'La referencia del pago movil es requerida',
+                                                ])
+                                                ->live()
+                                                ->prefix('#')
+                                                ->disabled(function (Get $get) {
+                                                    if (in_array('pago-movil', $get('tipo_bsd'))) {
+                                                        return false;
+                                                    }
+                                                    return true;
+                                                }),
+
+                                            TextInput::make('referencia_puntoVenta_bsd')
+                                                ->label('Ref: Punto de Venta')
+                                                ->required(fn(Get $get) => in_array('punto', $get('tipo_bsd')))
+                                                ->validationMessages([
+                                                    'required' => 'La referencia del punto de venta es requerida',
+                                                ])
+                                                ->prefix('#')
+                                                ->live()
+                                                ->disabled(function (Get $get) {
+                                                    if (in_array('punto', $get('tipo_bsd'))) {
+                                                        return false;
+                                                    }
+                                                    return true;
+                                                }),
+
+
+                                            TextInput::make('referencia_transferencia_bsd')
+                                                ->label('Ref: Transferencia')
+                                                ->required(fn(Get $get) => in_array('transferencia', $get('tipo_bsd')))
+                                                ->validationMessages([
+                                                    'required' => 'La referencia de la transferencia es requerida',
+                                                ])
+                                                ->prefix('#')
+                                                ->disabled(function (Get $get) {
+                                                    if (in_array('transferencia', $get('tipo_bsd'))) {
+                                                        return false;
+                                                    }
+                                                    return true;
+                                                }),
+
+                                        ])->hidden(fn(Get $get) => $get('metodo_pago') != 'bsd' && $get('metodo_pago') != 'multiple'),
+
+                                    Grid::make(3)
+                                        ->schema([
+                                            TextInput::make('pagoMovil_bsd')
+                                                ->label('Monto Pago Movil VES(Bs.)')
+                                                ->numeric()
+                                                // Read-only, because it's calculated
+                                                // ->readOnly()
+                                                ->placeholder('0.00')
+                                                ->prefix('Bs.')
+                                                ->disabled(function (Get $get) {
+                                                    for ($i = 0; $i < count($get('tipo_bsd')); $i++) {
+                                                        if ($get('tipo_bsd')[$i] == 'pago-movil') {
+                                                            return false;
+                                                        }
+                                                    }
+                                                    return true;
+                                                }),
+
+
+                                            TextInput::make('puntoVenta_bsd')
+                                                ->label('Monto Punto de Venta VES(Bs.)')
+                                                ->numeric()
+                                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                                    $total = $get('total_usd') - $get('pago_usd');
+                                                    $set('pago_bsd', round($total * Configuracion::first()->tasa_bcv, 2));
+                                                })
+                                                ->live(true)
+                                                ->placeholder('0.00')
+                                                ->prefix('Bs.')
+                                                ->disabled(function (Get $get) {
+                                                    for ($i = 0; $i < count($get('tipo_bsd')); $i++) {
+                                                        if ($get('tipo_bsd')[$i] == 'punto') {
+                                                            return false;
+                                                        }
+                                                    }
+                                                    return true;
+                                                }),
+
+
+
+                                            TextInput::make('transferencia_bsd')
+                                                ->label('Monto Transferencia VES(Bs.)')
+                                                ->numeric()
+                                                // Read-only, because it's calculated
+                                                // ->readOnly()
+                                                ->placeholder('0.00')
+                                                ->prefix('Bs.')
+                                                ->disabled(function (Get $get) {
+                                                    for ($i = 0; $i < count($get('tipo_bsd')); $i++) {
+                                                        if ($get('tipo_bsd')[$i] == 'transferencia') {
+                                                            return false;
+                                                        }
+                                                    }
+                                                    return true;
+                                                }),
+
+
+                                        ])->hidden(fn(Get $get) => $get('metodo_pago') != 'bsd'),
+                                    //----------------------------------------------------------------
+
+                                ])
+                                ->columnSpan(1)
+                                ->columns(1),
+                            //--------------------------------------------------
+                        ])
+                        ->action(function ($data, $record) {
+
+                            if ($data['metodo_pago'] == 'usd') {
+
+                                $registro_venta_usd = VentaController::registrar_venta_usd($record, $data, $record->detalles->toArray());
+                                if ($registro_venta_usd['success'] == true) {
+                                    Notification::make()
+                                        ->success()
+                                        ->title('Venta registrada')
+                                        ->send();
+                                } else {
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('ERROR')
+                                        ->body($registro_venta_usd['message'])
+                                        ->send();
+                                }
+                            }
+
+                            if ($data['metodo_pago'] == 'bsd') {
+
+                                $registro_venta_bsd = VentaController::registrar_venta_bsd($record, $data, $record->detalles->toArray());
+                                if ($registro_venta_bsd['success'] == true) {
+                                    Notification::make()
+                                        ->success()
+                                        ->title('Venta registrada')
+                                        ->send();
+                                } else {
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('ERROR')
+                                        ->body($registro_venta_bsd['message'])
+                                        ->send();
+                                }
+                            }
+
+                            if ($data['metodo_pago'] == 'multiple') {
+
+                                $registro_venta_multiple = VentaController::registrar_venta_multiple($record, $data, $record->detalles->toArray());
+                                if ($registro_venta_multiple['success'] == true) {
+                                    Notification::make()
+                                        ->success()
+                                        ->title('Venta registrada')
+                                        ->send();
+                                } else {
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('ERROR')
+                                        ->body($registro_venta_multiple['message'])
+                                        ->send();
+                                }
+                            }
+                        })
+                        ->color('success')
+                        // ->buttonLabel('Registrar venta')
+                        ->hidden(fn($record) => $record->status != 'por-procesar')
+                        // ->modalSubmitAction(fn(StaticAction $action, Get $get) => $action->label('Procesar venta'))
+                        ->icon('heroicon-o-check-circle'),
+                        
+                    Tables\Actions\DeleteAction::make()
+                        ->color('danger')
+                        ->icon('heroicon-o-trash')
+                        ->requiresConfirmation()
+                        ->size('sm')
+                        ->action(function ($record) {
+                            dd('aqui', $record);
+                        })
+                        ->after(function ($record) {
+                            dd($record);
+                        })
+                        ->hidden(fn($record) => $record->status == 'procesado'),
+                    Tables\Actions\ExportAction::make()
+                    ->exporter(PedidoExporter::class)
+                    ->formats([
+                        ExportFormat::Xlsx,
+                        ExportFormat::Csv,
+                    ])
+                ])
+                ->link()
+                ->label('Acciones')
+                // ->disabled(fn($record) => $record->status == 'procesado')
+                
+            ])
+            ->headerActions([
+                Tables\Actions\ExportAction::make()
+                    ->icon('heroicon-m-arrow-down-tray')
+                    ->color('success')
+                    ->exporter(PedidoExporter::class)
+                    ->formats([
+                        ExportFormat::Xlsx,
+                        ExportFormat::Csv,
+                    ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\ExportBulkAction::make()
+                        ->exporter(PedidoExporter::class)
+                        ->formats([
+                            ExportFormat::Xlsx,
+                            ExportFormat::Csv,
+                        ])
                 ]),
-            ]);
+            ])
+            ->striped();
     }
 
     public static function getRelations(): array
