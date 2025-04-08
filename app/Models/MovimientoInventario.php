@@ -20,6 +20,7 @@ class MovimientoInventario extends Model
         'tipo',
         'fecha_movimiento',
         'registrado_por',
+        'unidad_medida',
     ];
 
     /**

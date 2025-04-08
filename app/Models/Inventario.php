@@ -20,6 +20,7 @@ class Inventario extends Model
         'existencia',
         'precio_venta',
         'registrado_por',
+        'unidad_medida'
     ];
 
     /**

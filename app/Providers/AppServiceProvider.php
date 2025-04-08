@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentColor;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        FilamentColor::register([
+            'azul'         => Color::hex('#04C4D9'),
+            'azulClaro'    => Color::hex('#1ED9C6'),
+            'verdeOscuro'  => Color::hex('#238C3D'),
+            'verdeClaro'   => Color::hex('#49F262'),
+            'negro'        => Color::hex('#0D0D0D'),
+            'disabled'     => Color::hex('#A9A9A9'),
+            'danger'       => Color::hex('#b30000'),
+        ]);
     }
 }
