@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use App\Models\Categoria;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Forms\Components\Datepicker;
 use Filament\Forms\Components\Grid;
 use Illuminate\Support\Facades\Log;
 use Filament\Forms\Components\Radio;
@@ -120,7 +121,7 @@ class ProductoResource extends Resource
                                     ->required()
                                     ->maxLength(255),
                                 //fecha de vencimiento
-                                Forms\Components\Datepicker::make('fecha_vencimiento')
+                                Datepicker::make('fecha_vencimiento')
                                     ->label('Fecha de Vencimiento')
                                     ->prefixIcon('heroicon-c-calendar-days')
                                     ->minDate(now()->addDay(1)),
