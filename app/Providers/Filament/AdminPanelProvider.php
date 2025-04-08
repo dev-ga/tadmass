@@ -110,6 +110,14 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(asset('images/tadmasLogo.png'))
             ->darkModeBrandLogo(asset('images/tadmasLogoWhite.png'))
             ->brandLogoHeight('3.5rem')
+            ->navigationGroups([
+                'Comercial y Clientes',
+                'Ventas',
+                'Productos y Abastecimiento',
+                'Inventario',
+                'Contable',
+                'Configuración',
+            ])
             ->databaseNotifications();
     }
 
