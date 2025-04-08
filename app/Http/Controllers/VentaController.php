@@ -249,7 +249,7 @@ class VentaController extends Controller
 
     static function registrar_venta_multiple($record, $data_formulario, array $detalles)
     {
-        dd($record, $data_formulario, $detalles);
+
         try {
 
             //Calculo de las comisiones venta segun el detalle
