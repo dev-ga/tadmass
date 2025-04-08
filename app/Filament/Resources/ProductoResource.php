@@ -12,7 +12,7 @@ use Filament\Forms\Form;
 use App\Models\Categoria;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Forms\Components\Datepicker;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Illuminate\Support\Facades\Log;
 use Filament\Forms\Components\Radio;
