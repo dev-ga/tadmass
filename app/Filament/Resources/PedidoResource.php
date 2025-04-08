@@ -78,7 +78,7 @@ class PedidoResource extends Resource
                                 'required' => 'Debe seleccionar un cliente',
                             ])
                             ->searchable(),
-                            
+
                         Select::make('vendedor_id')
                             ->prefixIcon('heroicon-c-list-bullet')
                             ->label('Vendedor')
@@ -102,101 +102,101 @@ class PedidoResource extends Resource
                 Section::make()
                     ->schema([
                         TableRepeater::make('productos')
-                        ->headers([
-                            Header::make('Producto'),
-                            Header::make('Precio Unitario($)')->width('155px'),
-                            Header::make('Cantidad')->width('80px'),
-                            Header::make('Precio de venta($)')->width('155px'),
-                        ])
-                        // Repeatable field is live so that it will trigger the state update on each change
-                        ->live()
-                        // After adding a new row, we need to update the totals
-                        ->afterStateUpdated(function (Get $get, Set $set,) {
-                            self::updateTotals($get, $set);
-                        })
-                        // After deleting a row, we need to update the totals
-                        ->deleteAction(
-                            fn(Action $action) => $action->after(fn(Get $get, Set $set) => self::updateTotals($get, $set)),
-                        )
-                        ->schema([
-                            Forms\Components\Select::make('producto_id')
-                                ->relationship('productos', 'nombre')
-                                ->options(
-                                    $products->mapWithKeys(function (Producto $product) {
-                                        return [
-                                            $product->id => '
+                            ->headers([
+                                Header::make('Producto'),
+                                Header::make('Precio Unitario($)')->width('155px'),
+                                Header::make('Cantidad')->width('80px'),
+                                Header::make('Precio de venta($)')->width('155px'),
+                            ])
+                            // Repeatable field is live so that it will trigger the state update on each change
+                            ->live()
+                            // After adding a new row, we need to update the totals
+                            ->afterStateUpdated(function (Get $get, Set $set,) {
+                                self::updateTotals($get, $set);
+                            })
+                            // After deleting a row, we need to update the totals
+                            ->deleteAction(
+                                fn(Action $action) => $action->after(fn(Get $get, Set $set) => self::updateTotals($get, $set)),
+                            )
+                            ->schema([
+                                Forms\Components\Select::make('producto_id')
+                                    ->relationship('productos', 'nombre')
+                                    ->options(
+                                        $products->mapWithKeys(function (Producto $product) {
+                                            return [
+                                                $product->id => '
                                                 <div>
                                                     <div style="font-weight: bold;">' . e($product->nombre) . '</div>
                                                     <div style="font-size: 12px; color: #6b7280; text-transform: capitalize;">Tipo de venta: ' . e($product->tipo_venta) . '</div>
                                                 </div>'
-                                        ];
+                                            ];
+                                        })
+                                    )
+                                    ->native(false) // usa el select estilizado de Filament
+                                    ->allowHtml()
+                                    // Disable options that are already selected in other rows
+                                    ->disableOptionWhen(function ($value, $state, Get $get) {
+                                        return collect($get('../*.producto_id'))
+                                            ->reject(fn($id) => $id == $state)
+                                            ->filter()
+                                            ->contains($value);
                                     })
-                                )
-                                ->native(false) // usa el select estilizado de Filament
-                                ->allowHtml()
-                                // Disable options that are already selected in other rows
-                                ->disableOptionWhen(function ($value, $state, Get $get) {
-                                    return collect($get('../*.producto_id'))
-                                        ->reject(fn($id) => $id == $state)
-                                        ->filter()
-                                        ->contains($value);
-                                })
-                                ->afterStateUpdated(function (Get $get, Set $set,) {
-                                    //actualizamos el precio de venta
-                                    $set('precio_venta', Producto::find($get('producto_id'))->precio_venta);
-                                    // $set('subtotal_venta', Producto::find($get('producto_id'))->precio_venta * $get('cantidad'));
-                                })
-                                ->live()
-                                ->required()
-                                ->validationMessages([
-                                    'required' => 'Debe seleccionar un producto',
-                                ]),
-                                
-                            Forms\Components\TextInput::make('precio_venta')
-                                ->label('Precio de venta($)')
-                                ->prefix('US$')
-                                ->placeholder('0.00')
-                                ->numeric()
-                                ->disabled()
-                                ->dehydrated()
-                                ->required(),
-                            Forms\Components\TextInput::make('cantidad')
-                                ->label('Cantidad')
-                                ->integer()
-                                ->default(0)
-                                ->afterStateUpdated(function (Get $get, Set $set,) {
-                                    //actualizamos el precio de venta
-                                    $set('subtotal_venta', Producto::find($get('producto_id'))->precio_venta * $get('cantidad'));
-                                })
-                                ->required(),
-                                
-                            Forms\Components\TextInput::make('subtotal_venta')
-                                ->label('Precio de venta($)')
-                                ->prefix('US$')
-                                ->placeholder('0.00')
-                                ->numeric()
-                                ->disabled()
-                                ->dehydrated()
-                                ->required(),
+                                    ->afterStateUpdated(function (Get $get, Set $set,) {
+                                        //actualizamos el precio de venta
+                                        $set('precio_venta', Producto::find($get('producto_id'))->precio_venta);
+                                        // $set('subtotal_venta', Producto::find($get('producto_id'))->precio_venta * $get('cantidad'));
+                                    })
+                                    ->live()
+                                    ->required()
+                                    ->validationMessages([
+                                        'required' => 'Debe seleccionar un producto',
+                                    ]),
 
-                        ])
-                        // Disable reordering
-                        ->reorderable(false)
-                        ->relationship('detalles')
-                        ->stackAt(MaxWidth::Small)
-                        ->addable(function ($record) {
-                            if(isset($record->status) && $record->status == 'procesado'){
-                                return false;
-                            }
-                            return true;
-                        })
-                        ->deletable(function ($record) {
-                            if (isset($record->status) && $record->status == 'procesado') {
-                                return false;
-                            }
-                            return true;
-                        })
-                        ->columns(3)
+                                Forms\Components\TextInput::make('precio_venta')
+                                    ->label('Precio de venta($)')
+                                    ->prefix('US$')
+                                    ->placeholder('0.00')
+                                    ->numeric()
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->required(),
+                                Forms\Components\TextInput::make('cantidad')
+                                    ->label('Cantidad')
+                                    ->integer()
+                                    ->default(0)
+                                    ->afterStateUpdated(function (Get $get, Set $set,) {
+                                        //actualizamos el precio de venta
+                                        $set('subtotal_venta', Producto::find($get('producto_id'))->precio_venta * $get('cantidad'));
+                                    })
+                                    ->required(),
+
+                                Forms\Components\TextInput::make('subtotal_venta')
+                                    ->label('Precio de venta($)')
+                                    ->prefix('US$')
+                                    ->placeholder('0.00')
+                                    ->numeric()
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->required(),
+
+                            ])
+                            // Disable reordering
+                            ->reorderable(false)
+                            ->relationship('detalles')
+                            ->stackAt(MaxWidth::Small)
+                            ->addable(function ($record) {
+                                if (isset($record->status) && $record->status == 'procesado') {
+                                    return false;
+                                }
+                                return true;
+                            })
+                            ->deletable(function ($record) {
+                                if (isset($record->status) && $record->status == 'procesado') {
+                                    return false;
+                                }
+                                return true;
+                            })
+                            ->columns(3)
                     ])
                     ->columnSpan(2)
                     ->columns(1),
@@ -228,6 +228,7 @@ class PedidoResource extends Resource
                 Tables\Columns\TextColumn::make('codigo')
                     ->label('Código')
                     ->badge()
+                    ->color('colorAzul')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('cliente.nombre')
                     ->searchable(),
@@ -254,13 +255,13 @@ class PedidoResource extends Resource
                     ->numeric()
                     ->money('USD')
                     ->badge()
-                    ->color('success')
+                    ->color('verdeOscuro')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('monto_bsd')
                     ->label('Monto VES(Bs.)')
                     ->numeric()
                     ->badge()
-                    ->color('success')
+                    ->color('verdeOscuro')
                     ->icon('heroicon-o-credit-card')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
@@ -276,14 +277,14 @@ class PedidoResource extends Resource
                     Tables\Actions\ViewAction::make()
                         ->label('Ver Detalle')
                         ->modalHeading('Detalle del Pedido')
-                        ->color('primary')
+                        ->color('colorAzul')
                         ->modalWidth(MaxWidth::SixExtraLarge),
-                    
+
                     Tables\Actions\EditAction::make()
                         ->color('warning')
                         ->label('Editar')
                         ->hidden(fn($record) => $record->status == 'procesado'),
-                        
+
                     Tables\Actions\Action::make("Ejecutar venta")
                         ->form([
                             //Totales
@@ -317,7 +318,7 @@ class PedidoResource extends Resource
                             //--------------------------------------------------
                             Section::make()
                                 ->schema([
-                                    
+
                                     //Toggle para metodo de pago
                                     //-------------------------------------------------------------
                                     ToggleButtons::make('metodo_pago')
@@ -373,7 +374,7 @@ class PedidoResource extends Resource
                                                 ->prefix('#')
                                                 ->hidden(fn(Get $get) => $get('zelle') == null),
                                         ])->hidden(fn(Get $get) => $get('metodo_pago') != 'usd'),
-                                    
+
                                     //Toggle para tipo de pago en US$ y Bs.
                                     //-------------------------------------------------------------
                                     ToggleButtons::make('tipo_usd')
@@ -425,7 +426,7 @@ class PedidoResource extends Resource
                                                     return true;
                                                 })
                                                 ->hidden(fn(Get $get) => $get('metodo_pago') != 'bsd' && $get('metodo_pago') != 'multiple'),
-                                            
+
                                         ]),
 
                                     ToggleButtons::make('tipo_bsd')
@@ -444,8 +445,8 @@ class PedidoResource extends Resource
                                             'transferencia' => 'heroicon-m-banknotes',
                                         ])
                                         ->hidden(fn(Get $get) => $get('metodo_pago') != 'bsd' && $get('metodo_pago') != 'multiple'),
-                                        
-                                        
+
+
                                     //Input para pago en bsd
                                     //-------------------------------------------------------------
                                     Grid::make()
@@ -629,12 +630,12 @@ class PedidoResource extends Resource
                                 }
                             }
                         })
-                        ->color('success')
+                        ->color('verdeOscuro')
                         // ->buttonLabel('Registrar venta')
                         ->hidden(fn($record) => $record->status != 'por-procesar')
                         // ->modalSubmitAction(fn(StaticAction $action, Get $get) => $action->label('Procesar venta'))
                         ->icon('heroicon-o-check-circle'),
-                        
+
                     Tables\Actions\DeleteAction::make()
                         ->color('danger')
                         ->icon('heroicon-o-trash')
@@ -648,21 +649,23 @@ class PedidoResource extends Resource
                         })
                         ->hidden(fn($record) => $record->status == 'procesado'),
                     Tables\Actions\ExportAction::make()
-                    ->exporter(PedidoExporter::class)
-                    ->formats([
-                        ExportFormat::Xlsx,
-                        ExportFormat::Csv,
-                    ])
+                        ->exporter(PedidoExporter::class)
+                        ->formats([
+                            ExportFormat::Xlsx,
+                            ExportFormat::Csv,
+                        ])
                 ])
-                ->link()
+                ->icon('heroicon-c-bars-3-bottom-right')
+                ->button()
                 ->label('Acciones')
+                ->color('azul')
                 // ->disabled(fn($record) => $record->status == 'procesado')
-                
+
             ])
             ->headerActions([
                 Tables\Actions\ExportAction::make()
                     ->icon('heroicon-m-arrow-down-tray')
-                    ->color('success')
+                    ->color('verdeOscuro')
                     ->exporter(PedidoExporter::class)
                     ->formats([
                         ExportFormat::Xlsx,
@@ -672,7 +675,7 @@ class PedidoResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                Tables\Actions\ExportBulkAction::make()
+                    Tables\Actions\ExportBulkAction::make()
                         ->exporter(PedidoExporter::class)
                         ->formats([
                             ExportFormat::Xlsx,
@@ -720,7 +723,6 @@ class PedidoResource extends Resource
         $set('subtotal', number_format($subtotal, 2, '.', ''));
         $set('monto_usd', number_format($subtotal, 2, '.', ''));
         $set('monto_bsd', number_format($subtotal * $parametro->tasa_bcv, 2, '.', ''));
-
     }
 
     public static function getNavigationGroup(): ?string

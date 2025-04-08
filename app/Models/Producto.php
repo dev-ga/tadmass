@@ -17,7 +17,7 @@ class Producto extends Model
         'nombre',
         'descripcion',
         'categoria_id',
-        'imagen',
+        'image',
         'marca',
         'modelo',
         'fecha_vencimiento',

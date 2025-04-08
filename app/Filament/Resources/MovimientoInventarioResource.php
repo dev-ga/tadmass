@@ -2,16 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MovimientoInventarioResource\Pages;
-use App\Filament\Resources\MovimientoInventarioResource\RelationManagers;
-use App\Models\MovimientoInventario;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Models\MovimientoInventario;
+use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\MovimientoInventarioResource\Pages;
+use App\Filament\Resources\MovimientoInventarioResource\RelationManagers;
 
 class MovimientoInventarioResource extends Resource
 {
@@ -42,22 +43,31 @@ class MovimientoInventarioResource extends Resource
                     ->badge()
                     ->color(function (mixed $state): string {
                         return match ($state) {
-                            'entrada' => 'success',
+                            'entrada' => 'verdeOscuro',
                             'salida' => 'danger',
                         };
                     })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('cantidad')
                     ->badge()
-                    ->color('success')
+                    ->color('verdeOscuro')
                     ->icon('heroicon-c-shopping-cart')
                     ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('unidad_medida')
+                    ->label('Unidad')
+                    ->color('verdeOscuro')
+                    ->badge()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Fecha de Registro')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('registrado_por')
+                    ->label('Registrado por')
+                    ->icon('heroicon-c-user')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -68,12 +78,31 @@ class MovimientoInventarioResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // ActionGroup::make([
+                //     // Tables\Actions\ViewAction::make(),
+                //     // Tables\Actions\EditAction::make(),
+                //     Tables\Actions\DeleteAction::make(), 
+                // ])
+                // // ->link()
+                // ->icon('heroicon-c-bars-3-bottom-right')
+                // ->button()
+                // ->label('Acciones')
+                // ->color('azul')
+            ])
+            ->headerActions([
+                // Tables\Actions\ExportAction::make()
+                //     ->icon('heroicon-m-arrow-down-tray')
+                //     ->color('verdeOscuro')
+                //     ->exporter(PedidoExporter::class)
+                //     ->formats([
+                //         ExportFormat::Xlsx,
+                //         ExportFormat::Csv,
+                //     ])
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 

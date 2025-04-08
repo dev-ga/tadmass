@@ -4,12 +4,16 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\Almacen;
 use Filament\Forms\Form;
 use App\Models\Inventario;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Section;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\InventarioResource\Pages;
@@ -90,14 +94,23 @@ class InventarioResource extends Resource
                     ->label('Almacén')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('existencia')
+                    ->label('Existencia')
+                    ->icon('heroicon-c-adjustments-vertical')
+                    ->color('verdeOscuro')
+                    ->badge()
                     ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('unidad_medida')
+                    ->label('Unidad')
+                    ->color('verdeOscuro')
+                    ->badge()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('precio_venta')
                     ->badge()
-                    ->color('success')
+                    ->color('verdeOscuro')
                     ->icon('heroicon-s-currency-dollar')
                     ->label('Precio US$')
-                    ->numeric()
+                    ->money('USD')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('registrado_por')
                     ->searchable(),
@@ -115,32 +128,161 @@ class InventarioResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                ActionGroup::make([
+                    // Tables\Actions\ViewAction::make(),
+                    // Tables\Actions\EditAction::make()
+                    // ->color('verdeOscuro'),
+                    // Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\Action::make('Mover Existencia')
+                        ->label('Mover Existencia')
+                        ->color('azul')
+                        ->icon('heroicon-s-truck')
+                        ->form([
+                            Section::make('MOVER EXISTENCIA')
+                                ->icon('heroicon-s-truck')
+                                ->description('Fomrulario de Mover Existencia de los productos del almacén mayorista al almacén detal')
+                                ->schema([
+                                    Forms\Components\Select::make('almacen_id')
+                                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                                        ->options(Almacen::select('id', 'nombre')->where('tipo_almacen', 'detal')->pluck('nombre', 'id'))
+                                        ->preload()
+                                        ->searchable()
+                                        // ->relationship('almacen', 'nombre')
+                                        ->required(),
+                                    Forms\Components\TextInput::make('cantidad')
+                                        ->label('Cantidad en Bultos')
+                                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                                        ->required(),
+                                    Forms\Components\TextInput::make('precio_venta')
+                                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                                        ->label('Precio Venta en US$')
+                                        ->hint('Separador decimal(.)')
+                                        ->required(),
+
+                                ])->columns(2),
+                        ])
+                        ->action(function ($record, array $data) {
+
+                            $mover_existencia_individual = MovimientoInventarioController::mover_existencia_individual($record, $data);
+
+                            if ($mover_existencia_individual['success'] == true) {
+                                Notification::make()
+                                    ->success()
+                                    ->title('Movimiento Exitoso')
+                                    ->body($mover_existencia_individual['message'])
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->danger()
+                                    ->title('Error')
+                                    ->body($mover_existencia_individual['message'])
+                                    ->send();
+                            }
+                        }),
+                    Tables\Actions\Action::make('Reposicion')
+                        ->label('Mover Existencia')
+                        ->color('azul')
+                        ->icon('heroicon-s-truck')
+                        ->form([
+                            Section::make('MOVER EXISTENCIA')
+                                ->icon('heroicon-s-truck')
+                                ->description('Fomrulario de Mover Existencia de los productos del almacén mayorista al almacén detal')
+                                ->schema([
+                                    Forms\Components\Select::make('almacen_id')
+                                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                                        ->options(Almacen::select('id', 'nombre')->where('tipo_almacen', 'detal')->pluck('nombre', 'id'))
+                                        ->preload()
+                                        ->searchable()
+                                        // ->relationship('almacen', 'nombre')
+                                        ->required(),
+                                    Forms\Components\TextInput::make('cantidad')
+                                        ->label('Cantidad en Bultos')
+                                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                                        ->required(),
+                                    Forms\Components\TextInput::make('precio_venta')
+                                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                                        ->label('Precio Venta en US$')
+                                        ->hint('Separador decimal(.)')
+                                        ->required(),
+
+                                ])->columns(2),
+                        ])
+                        ->action(function ($record, array $data) {
+
+                            $mover_existencia_individual = MovimientoInventarioController::mover_existencia_individual($record, $data);
+
+                            if ($mover_existencia_individual['success'] == true) {
+                                Notification::make()
+                                    ->success()
+                                    ->title('Movimiento Exitoso')
+                                    ->body($mover_existencia_individual['message'])
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->danger()
+                                    ->title('Error')
+                                    ->body($mover_existencia_individual['message'])
+                                    ->send();
+                            }
+                        }),
+                ])
+                ->icon('heroicon-c-bars-3-bottom-right')
+                ->button()
+                ->label('Acciones')
+                ->color('azulClaro')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\BulkAction::make('Mover Existencia')
-                    ->label('Mover Existencia')
-                    ->color('warning')
-                    ->icon('heroicon-s-truck')
-                    ->form([
-                        Forms\Components\Select::make('almacen_id')
-                            ->prefixIcon('heroicon-c-clipboard-document-list')
-                            ->relationship('almacen', 'nombre')
-                            ->required(),
-                        Forms\Components\TextInput::make('cantidad')
-                            ->label('Cantidad en Bultos')
-                            ->prefixIcon('heroicon-c-clipboard-document-list')
-                            ->required(),
-                    ])
-                    ->action(function (Collection $records, array $data) {
-                        // dd(str_replace('-M-', '-D-',  $records[0]->codigo), $records[0]->codigo, $records);
-                        $mover_existencia = MovimientoInventarioController::mover_existencia($records, $data);
+                        ->label('Mover Existencia')
+                        ->color('azul')
+                        ->icon('heroicon-s-truck')
+                        ->form([
+                            Section::make('MOVER EXISTENCIA')
+                                ->icon('heroicon-s-truck')
+                                ->description('Fomrulario de Mover Existencia de los productos del almacén mayorista al almacén detal')
+                                ->schema([
+                                    Forms\Components\Select::make('almacen_id')
+                                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                                        ->options(Almacen::select('id', 'nombre')->where('tipo_almacen', 'detal')->pluck('nombre', 'id'))
+                                        ->preload()
+                                        ->searchable()
+                                        // ->relationship('almacen', 'nombre')
+                                        ->required(),
+                                    Forms\Components\TextInput::make('cantidad')
+                                        ->label('Cantidad en Bultos')
+                                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                                        ->required(),
+                                    Forms\Components\TextInput::make('precio_venta')
+                                        ->prefixIcon('heroicon-c-clipboard-document-list')
+                                        ->label('Precio Venta en US$')
+                                        ->hint('Separador decimal(.)')
+                                        ->required(),
+                                    
+                                ])->columns(2),
+                        ])
+                        ->action(function (Collection $records, array $data) {
+                            // dd(str_replace('-M-', '-D-',  $records[0]->codigo), $records[0]->codigo, $records);
+                            for ($i = 0; $i < count($records); $i++) {
+                                $mover_existencia = MovimientoInventarioController::mover_existencia_masiva($records[$i], $data);
 
-                    })
+                                if ($mover_existencia['success'] == true) {
+                                    Notification::make()
+                                        ->success()
+                                        ->title('Movimiento Masivo Exitoso')
+                                        ->body($mover_existencia['message'])
+                                        ->send();
+                                } else {
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('Error')
+                                        ->body($mover_existencia['message'])
+                                        ->send();
+                                }
+                            }
 
-
+                        }),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

@@ -26,13 +26,13 @@ class EditPedido extends EditRecord
 
     protected function getFormActions(): array
     {
-        if($this->record->status == 'procesado'){
+        if ($this->record->status == 'procesado') {
             return [];
         }
         return [
             $this->getSaveFormAction()
                 ->formId('form'),
-                $this->getCancelFormAction()
+            $this->getCancelFormAction()
                 ->formId('form')
         ];
     }
@@ -140,7 +140,7 @@ class EditPedido extends EditRecord
     //                         ->live()
     //                         ->inline()
     //                         ->default('cash'),
-                             
+
     //                     ToggleButtons::make('tipo_bsd')
     //                         ->multiple()
     //                         ->label('Tipo VES(Bs.)')
@@ -176,7 +176,7 @@ class EditPedido extends EditRecord
     //                                     }
     //                                     return true;
     //                                 }),
-                                    
+
     //                             TextInput::make('referencia_puntoVenta_bsd')
     //                                 ->label('Ref: Punto de Venta')
     //                                 ->required(fn(Get $get) => in_array('punto', $get('tipo_bsd')))
@@ -191,7 +191,7 @@ class EditPedido extends EditRecord
     //                                     }
     //                                     return true;
     //                                 }),
-                                    
+
 
     //                             TextInput::make('referencia_transferencia_bsd')
     //                                 ->label('Ref: Transferencia')
@@ -206,7 +206,7 @@ class EditPedido extends EditRecord
     //                                     }
     //                                     return true;
     //                                 }),
-                                    
+
     //                         ])->hidden(fn(Get $get) => $get('metodo_pago') != 'bsd' && $get('metodo_pago') != 'multiple'),
 
     //                     Grid::make(3)
@@ -227,7 +227,7 @@ class EditPedido extends EditRecord
     //                                     }
     //                                     return true;
     //                                 }),
-                                 
+
 
     //                             TextInput::make('puntoVenta_bsd')
     //                                 ->label('Monto Punto de Venta VES(Bs.)')
@@ -247,7 +247,7 @@ class EditPedido extends EditRecord
     //                                     }
     //                                     return true;
     //                                 }),
-                           
+
 
 
     //                             TextInput::make('transferencia_bsd')
@@ -265,7 +265,7 @@ class EditPedido extends EditRecord
     //                                     }
     //                                     return true;
     //                                 }),
-                                   
+
 
     //                 ])->hidden(fn(Get $get) => $get('metodo_pago') != 'bsd'),
     //                     //-----------------------------------------------------------------
@@ -380,7 +380,7 @@ class EditPedido extends EditRecord
     //             }
 
     //         })
-    //         ->color('success')
+    //         ->color('verdeOscuro')
     //         ->hidden(fn() => $this->record->status != 'por-procesar')
     //         ->modalSubmitAction(fn(StaticAction $action, Get $get) => $action->label('Procesar venta'))
     //         ->icon('heroicon-o-check-circle'),
@@ -396,5 +396,4 @@ class EditPedido extends EditRecord
             $set('monto_bsd', $get('total_bsd'));
         }
     }
-
 }

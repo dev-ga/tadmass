@@ -12,6 +12,7 @@ use App\Models\Configuracion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Filament\Notifications\Notification;
 use App\Http\Controllers\ProductoController;
 
 class VentaController extends Controller
@@ -238,10 +239,11 @@ class VentaController extends Controller
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage());
-            return [
-                'success' => false,
-                'message' => $th->getMessage()
-            ];
+            Notification::make()
+                ->title('Error')
+                ->danger()
+                ->body('Ocurrio un error al registrar el producto, favor de intentar nuevamente. Si persiste el error, contacte al administrador.')
+                ->send();
         }
     }
 
