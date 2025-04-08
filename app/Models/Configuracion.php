@@ -39,5 +39,6 @@ class Configuracion extends Model
         'dash_panel_page_header_action_before',
         'dash_panel_page_header_action_after',
         'dash_panel_titulo',
+        'fecha_update_tasa',
     ];
 }

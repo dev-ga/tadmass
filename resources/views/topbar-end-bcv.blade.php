@@ -1,4 +1,4 @@
-@php
+{{-- @php
 use App\Models\Configuracion;
 $tasa = Configuracion::first()->tasa_bcv;
 
@@ -15,4 +15,8 @@ $tasa = Configuracion::first()->tasa_bcv;
             {{ $tasa }}Bs.
         </div>
     </div>
+</div> --}}
+
+<div>
+    @livewire('actualizar-tasa-bcv')
 </div>

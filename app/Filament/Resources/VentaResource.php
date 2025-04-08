@@ -222,41 +222,40 @@ class VentaResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
                     ->label('Código')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('cliente.id')
+                Tables\Columns\TextColumn::make('cliente.nombre')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('vendedor.id')
+                Tables\Columns\TextColumn::make('vendedor.nombre')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('fecha')
-                    ->searchable(),
+
                 Tables\Columns\TextColumn::make('metodo_pago')
                     ->label('Método de Pago')
+                    ->badge()
+                    ->alignCenter()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('monto_usd')
-                    ->label('Monto USD')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('total_venta_usd')
+                    ->label('Venta US$')
+                    ->money('USD')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('monto_bsd')
-                    ->label('Monto Bs.')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('total_venta')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('total_venta_bsd')
+                    ->label('Venta VES(Bs.)')
+                    ->money('VES')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tasa_bcv')
                     ->label('Tasa BCV')
-                    ->numeric()
+                    ->money('VES')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('comision_usd')
-                    ->label('Comisión USD')
-                    ->numeric()
+                    ->label('Comisión US$')
+                    ->money('USD')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('comision_bsd')
-                    ->label('Comisión Bs.')
-                    ->numeric()
+                    ->label('Comisión VES(Bs.)')
+                ->money('VES')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('registrado_por')
                     ->searchable(),

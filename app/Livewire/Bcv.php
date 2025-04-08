@@ -30,24 +30,34 @@ class Bcv extends Component implements HasForms, HasActions
     public function ActualizarAction(): Action
     {
         return Action::make('actualizar')
-        ->label('Actualizar BCV')
-            // ->icon('heroicon-c-user-plus')
+            ->label('Actualizar BCV')
             ->modalHeading(false)
-            ->modalWidth(MaxWidth::Small)
-            ->color('info')
+            ->modalWidth(MaxWidth::Large)
+            ->color('azul')
             ->form([
-                Section::make('BCV')
-                    ->icon('heroicon-c-user-plus')
+                Section::make('Banco Central de Venezuela')
+                ->label('Actualizar BCV')
+                ->description('Formulario de actualizacion de la tasa. Campos Requeridos(*)')
+                    ->icon('heroicon-s-currency-dollar')
                     ->schema([
                         //Imputs
-                        TextInput::make('tasa')->label('Tasa (Bs.)')->required()
+                        TextInput::make('tasa')
+                        ->label('VES(Bs.)')
+                        ->hint('Separador decimal(.)')
+                        ->required()
 
                     ])
             ])
             ->action(function (array $arguments, array $data) {
 
-                dd(1);
-            });
+                Configuracion::select('id, tasa_bcv, fecha_update_tasa')->where('id', 1)->update([
+                    'tasa_bcv' => $data['tasa'],
+                    'fecha_update_tasa' => now()->format('d-m-Y')
+                ]);
+
+                $this->dispatch('bcv-update');
+            })
+            ->modalSubmitActionLabel('Actualiazar');
     }
 
 

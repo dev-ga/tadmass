@@ -4,26 +4,27 @@ namespace App\Providers\Filament;
 
 use Filament\Pages;
 use Filament\Panel;
+use ReflectionClass;
 use Filament\Widgets;
 use Filament\PanelProvider;
+use Illuminate\Support\Str;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
+use Illuminate\Support\Facades\Blade;
+use App\Http\Middleware\ValidacionTasaBcv;
 use Filament\Http\Middleware\Authenticate;
+use Filament\Support\Facades\FilamentView;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use ReflectionClass;
-
 use Filament\Tables\View\TablesRenderHook as ViewTablesRenderHook;
-use Filament\Support\Facades\FilamentView;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Str;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -117,7 +118,19 @@ class AdminPanelProvider extends PanelProvider
                 'Contable',
                 'Configuración',
             ])
-            ->databaseNotifications();
+            ->databaseNotifications()
+            ->middleware([  
+                EncryptCookies::class,
+                AddQueuedCookiesToResponse::class,
+                StartSession::class,
+                AuthenticateSession::class,
+                ShareErrorsFromSession::class,
+                VerifyCsrfToken::class,
+                SubstituteBindings::class,
+                DisableBladeIconComponents::class,
+                DispatchServingFilamentEvent::class,
+                
+            ]);
     }
 
     public function boot(): void

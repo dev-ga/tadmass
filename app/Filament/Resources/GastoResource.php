@@ -115,11 +115,11 @@ class GastoResource extends Resource
                             ->required()
                             ->options(function (Get $get) {
                                 if ($get('forma_pago') == 'dolares') {
-                                    return MetodoPago::where('tipo_moneda', 'usd')->pluck('descripcion', 'id');
+                                    return MetodoPago::where('tipo_moneda', 'usd')->pluck('descripcion', 'descripcion');
                                 }
 
                                 if ($get('forma_pago') == 'bolivares') {
-                                    return MetodoPago::where('tipo_moneda', 'bsd')->pluck('descripcion', 'id');
+                                    return MetodoPago::where('tipo_moneda', 'bsd')->pluck('descripcion', 'descripcion');
                                 }
                             })
                             ->live(),
@@ -260,27 +260,28 @@ class GastoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
-                Tables\Columns\TextColumn::make('nro_gasto')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('nro_gasto')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('codigo')
                     ->label('Código')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('descripcion')
                     ->label('Descripción')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tipo_gasto')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('tipo_gasto')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('numero_factura')
                     ->label('Número de Factura')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nro_control')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('fecha')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('fecha')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('fecha_factura')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('proveedor_id')
+                Tables\Columns\TextColumn::make('proveedor.nombre')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('metodo_pago')
@@ -288,27 +289,27 @@ class GastoResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tasa_bcv')
                     ->label('Tasa BCV')
-                    ->numeric()
+                    ->money('VES')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('monto_usd')
-                    ->label('Monto USD')
-                    ->numeric()
+                    ->label('Monto US$')
+                    ->money('USD')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('monto_bsd')
-                    ->label('Monto Bs.')
-                    ->numeric()
+                    ->label('Monto VES(Bs.)')
+                    ->money('VES')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('iva')
                     ->label('IVA')
-                    ->numeric()
+                    ->money('VES')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_gasto_bsd')
                     ->label('Total gastos Bs.')
-                    ->numeric()
+                    ->money('VES')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('conversion_usd')
                     ->label('Conversión USD')
-                    ->numeric()
+                    ->money('USD')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('registrado_por')
                     ->searchable(),

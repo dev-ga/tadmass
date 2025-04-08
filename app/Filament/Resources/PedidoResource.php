@@ -224,6 +224,7 @@ class PedidoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('codigo')
                     ->label('Código')
@@ -587,6 +588,7 @@ class PedidoResource extends Resource
                                         ->success()
                                         ->title('Venta registrada')
                                         ->send();
+                                    // return redirect()->route('filament.resources.pedido.index');
                                 } else {
                                     Notification::make()
                                         ->danger()
@@ -604,6 +606,7 @@ class PedidoResource extends Resource
                                         ->success()
                                         ->title('Venta registrada')
                                         ->send();
+                                    // return redirect()->route('filament.resources.pedido.index');
                                 } else {
                                     Notification::make()
                                         ->danger()
@@ -621,6 +624,7 @@ class PedidoResource extends Resource
                                         ->success()
                                         ->title('Venta registrada')
                                         ->send();
+                                    // return redirect()->route('filament.resources.pedido.index');
                                 } else {
                                     Notification::make()
                                         ->danger()
@@ -633,8 +637,9 @@ class PedidoResource extends Resource
                         ->color('verdeOscuro')
                         // ->buttonLabel('Registrar venta')
                         ->hidden(fn($record) => $record->status != 'por-procesar')
-                        // ->modalSubmitAction(fn(StaticAction $action, Get $get) => $action->label('Procesar venta'))
+                        ->modalSubmitActionLabel('Procesar Venta')
                         ->icon('heroicon-o-check-circle'),
+                        // ->successRedirectUrl(route('filament.admin.resources.ventas.index')),
 
                     Tables\Actions\DeleteAction::make()
                         ->color('danger')

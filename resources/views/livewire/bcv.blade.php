@@ -9,7 +9,7 @@
                             x-init="$watch('darkMode', value => $el.src = value ? '{{ asset('images/BCV.png') }}' : '{{ asset('images/BCV2.png') }}')"
                             :src="darkMode ? '{{ asset('images/BCV.png') }}' : '{{ asset('images/BCV2.png') }}'"
                             class="w-16 h-auto p-0.5 rounded-full"
-                            alt="Logo" style="margin-right: 20px">
+                            alt="Logo" style="margin-right: 5px">
                             {{-- negro --}}
                         {{-- <img class="w-16 h-auto rounded-full block dark:hidden" src="{{ asset('images/BCV2.png') }}" alt="" style="margin-right: 20px"> --}}
                             {{-- blanco --}}
