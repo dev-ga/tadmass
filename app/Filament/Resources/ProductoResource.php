@@ -244,6 +244,15 @@ class ProductoResource extends Resource
                 Tables\Columns\TextColumn::make('codigo')
                     ->label('Código')
                     ->badge()
+                    ->color(function (Producto $record) {
+                        if ($record->tipo_venta == 'detal') {
+                            return 'verdeClaro';
+                        }
+
+                        if ($record->tipo_venta == 'mayor') {
+                            return 'verdeOscuro';
+                        }
+                    })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nombre')
                     ->searchable(),

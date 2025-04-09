@@ -12,7 +12,7 @@ class PagoDetalle extends Model
     protected $fillable = [
         'venta_id',
         'codigo_venta',
-        'productos',
+        'prod_asociados',
         'total_venta_bsd',
         'total_venta_usd',
         'efectivo_usd',
@@ -26,6 +26,10 @@ class PagoDetalle extends Model
         'referencia_pagoMovil_bsd',
         'referencia_transferencia_bsd',
         'registrado_por',
+    ];
+
+    protected $casts = [
+        'prod_asociados' => 'json'
     ];
 
     /**

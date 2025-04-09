@@ -24,6 +24,12 @@ class Venta extends Model
         'comision_usd',
         'comision_bsd',
         'registrado_por',
+        'prod_asociados',
+        'pedido_id'
+    ];
+
+    protected $casts = [
+        'prod_asociados' => 'json'
     ];
 
     /**
@@ -75,4 +81,6 @@ class Venta extends Model
     {
         return $this->hasMany(PagoDetalle::class, 'venta_id', 'id');
     }
+
+
 }

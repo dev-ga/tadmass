@@ -19,11 +19,12 @@ class VentaController extends Controller
 {
     
     static function registrar_venta_usd($record, $data_formulario , array $detalles) {
-        
+
         try {
 
-            //Calculo de las comisiones venta segun el detalle
+            //Calculo de las comisiones de venta segun el detalle y array de productos
             $comisiones = [];
+            $array_productos = [];
 
             for ($i = 0; $i < count($detalles); $i++) {
                 
@@ -32,12 +33,13 @@ class VentaController extends Controller
                 $total_comision = $porcentaje * $detalles[$i]['cantidad'];
 
                 array_push($comisiones, $total_comision);
+                array_push($array_productos, $producto->nombre);
                 
             }
 
             $comisiones_venta = array_sum($comisiones);
             
-            DB::transaction(function () use ($record, $data_formulario, $comisiones_venta, $detalles) {
+            DB::transaction(function () use ($record, $data_formulario, $comisiones_venta, $detalles, $array_productos) {
 
                 $venta = new Venta();
                 $venta->codigo            = 'TADMASS-V-' . rand(111111, 999999);
@@ -50,12 +52,13 @@ class VentaController extends Controller
                 $venta->comision_usd      = $comisiones_venta;
                 $venta->comision_bsd      = $comisiones_venta * $venta->tasa_bcv;
                 $venta->registrado_por    = Auth::user()->name;
+                $venta->prod_asociados    = $array_productos;
                 $venta->save();
 
                 //Actualizamos el estatu del pedido
                 $record->status = 'procesado';
-                $record->save();  
-
+                $record->save();
+                
                 for ($i = 0; $i < count($detalles); $i++) {
                     $detalle = new VentaDetalle();
                     $detalle->venta_id = $venta->id;
@@ -64,6 +67,7 @@ class VentaController extends Controller
                     $detalle->precio_venta = $detalles[$i]['precio_venta'];
                     $detalle->subtotal = $detalle->precio_venta * $detalle->cantidad;
                     $detalle->save();
+
                 }
 
                 /**
@@ -76,10 +80,11 @@ class VentaController extends Controller
                     $pago->venta_id = $venta->id;
                     $pago->codigo_venta = $venta->codigo;
                     $pago->tipo_pago = 'efectivo US$';
-                    $pago->productos = ProductoController::json_productos($detalles);
+                    $pago->prod_asociados    = $array_productos;
                     $pago->total_venta_usd   = $data_formulario['total_usd'];
                     $pago->total_venta_bsd   = $data_formulario['total_bsd'];
                     $pago->efectivo_usd      = $data_formulario['cash'];
+                    $pago->referencia_zelle_usd = $data_formulario['ref_zelle'] ? $data_formulario['ref_zelle'] : 'N/A';
                     $pago->registrado_por    = Auth::user()->name;
                     $pago->save();
 
@@ -88,7 +93,7 @@ class VentaController extends Controller
                     $pago->venta_id             = $venta->id;
                     $pago->codigo_venta         = $venta->codigo;
                     $pago->tipo_pago            = 'zelle US$';
-                    $pago->productos            = ProductoController::json_productos($detalles);
+                    $pago->prod_asociados    = $array_productos;
                     $pago->total_venta_usd      = $data_formulario['total_usd'];
                     $pago->total_venta_bsd      = $data_formulario['total_bsd'];
                     $pago->zelle_usd            = $data_formulario['zelle'];
@@ -101,7 +106,7 @@ class VentaController extends Controller
                     $pago->venta_id             = $venta->id;
                     $pago->codigo_venta         = $venta->codigo;
                     $pago->tipo_pago            = 'multiple US$';
-                    $pago->productos            = ProductoController::json_productos($detalles);
+                    $pago->prod_asociados    = $array_productos;
                     $pago->total_venta_usd      = $data_formulario['total_usd'];
                     $pago->total_venta_bsd      = $data_formulario['total_bsd'];
                     $pago->efectivo_usd         = $data_formulario['cash'];
@@ -136,6 +141,7 @@ class VentaController extends Controller
 
             //Calculo de las comisiones venta segun el detalle
             $comisiones = [];
+            $array_productos = [];
 
             for ($i = 0; $i < count($detalles); $i++) {
 
@@ -144,11 +150,12 @@ class VentaController extends Controller
                 $total_comision = $porcentaje * $detalles[$i]['cantidad'];
 
                 array_push($comisiones, $total_comision);
+                array_push($array_productos, $producto->nombre);
             }
 
             $comisiones_venta = array_sum($comisiones);
 
-            DB::transaction(function () use ($record, $data_formulario, $comisiones_venta, $detalles) {
+            DB::transaction(function () use ($record, $data_formulario, $comisiones_venta, $detalles, $array_productos) {
 
                 $venta = new Venta();
                 $venta->codigo            = 'TADMASS-V-' . rand(111111, 999999);
@@ -161,6 +168,7 @@ class VentaController extends Controller
                 $venta->comision_usd      = $comisiones_venta;
                 $venta->comision_bsd      = $comisiones_venta * $venta->tasa_bcv;
                 $venta->registrado_por    = Auth::user()->name;
+                $venta->prod_asociados    = $array_productos;
                 $venta->save();
 
                 //Actualizamos el estatu del pedido
@@ -215,7 +223,7 @@ class VentaController extends Controller
                     $pago->venta_id = $venta->id;
                     $pago->codigo_venta = $venta->codigo;
                     $pago->tipo_pago = $tipo_pago;
-                    $pago->productos = ProductoController::json_productos($detalles);
+                    $pago->prod_asociados    = $array_productos;
                     $pago->total_venta_usd   = $data_formulario['total_usd'];
                     $pago->total_venta_bsd   = $data_formulario['total_bsd'];
                     $pago->pagoMovil_bsd      = $pagoMovil_bsd;
@@ -239,11 +247,10 @@ class VentaController extends Controller
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage());
-            Notification::make()
-                ->title('Error')
-                ->danger()
-                ->body('Ocurrio un error al registrar el producto, favor de intentar nuevamente. Si persiste el error, contacte al administrador.')
-                ->send();
+            return [
+                'success' => false,
+                'message' => $th->getMessage(),
+            ];
         }
     }
 
@@ -254,6 +261,7 @@ class VentaController extends Controller
 
             //Calculo de las comisiones venta segun el detalle
             $comisiones = [];
+            $array_productos = [];
 
             for ($i = 0; $i < count($detalles); $i++) {
 
@@ -262,11 +270,12 @@ class VentaController extends Controller
                 $total_comision = $porcentaje * $detalles[$i]['cantidad'];
 
                 array_push($comisiones, $total_comision);
+                array_push($array_productos, $producto->nombre);
             }
 
             $comisiones_venta = array_sum($comisiones);
 
-            DB::transaction(function () use ($record, $data_formulario, $comisiones_venta, $detalles) {
+            DB::transaction(function () use ($record, $data_formulario, $comisiones_venta, $detalles, $array_productos) {
 
                 $venta = new Venta();
                 $venta->codigo            = 'TADMASS-V-' . rand(111111, 999999);
@@ -279,6 +288,7 @@ class VentaController extends Controller
                 $venta->comision_usd      = $comisiones_venta;
                 $venta->comision_bsd      = $comisiones_venta * $venta->tasa_bcv;
                 $venta->registrado_por    = Auth::user()->name;
+                $venta->prod_asociados    = $array_productos;
                 $venta->save();
 
                 //Actualizamos el estatu del pedido
@@ -303,7 +313,7 @@ class VentaController extends Controller
                 $pago->venta_id                         = $venta->id;
                 $pago->codigo_venta                     = $venta->codigo;
                 $pago->tipo_pago                        = 'multiple US$-VES(Bs.)';
-                $pago->productos                        = ProductoController::json_productos($detalles);
+                $pago->prod_asociados                   = $array_productos;
                 $pago->total_venta_usd                  = $data_formulario['total_usd'];
                 $pago->total_venta_bsd                  = $data_formulario['total_bsd'];
                 $pago->efectivo_usd                     = $data_formulario['tipo_usd'] == 'cash' ? $data_formulario['pago_usd'] : 0.00;
