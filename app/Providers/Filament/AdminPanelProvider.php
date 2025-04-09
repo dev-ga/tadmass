@@ -10,6 +10,7 @@ use Filament\PanelProvider;
 use Illuminate\Support\Str;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Blade;
 use App\Http\Middleware\ValidacionTasaBcv;
 use Filament\Http\Middleware\Authenticate;
@@ -18,8 +19,8 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
 use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
 
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -130,7 +131,8 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
                 
-            ]);
+            ])
+            ->maxContentWidth(MaxWidth::Full);
     }
 
     public function boot(): void

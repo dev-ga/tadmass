@@ -12,20 +12,14 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Configuracion;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Actions\ActionGroup;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Components\Actions\Action;
 use App\Filament\Resources\VentaResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\VentaResource\RelationManagers;
 use App\Filament\Resources\VentaResource\RelationManagers\DetallesRelationManager;
 use App\Filament\Resources\VentaResource\RelationManagers\PagoDetallesRelationManager;
 use App\Filament\Resources\VentaResource\RelationManagers\PedidoDetalleRelationManager;
+use Filament\Forms\Components\DatePicker;
 
 class VentaResource extends Resource
 {
@@ -44,7 +38,7 @@ class VentaResource extends Resource
                     ->heading('Detalles de la Venta')
                     ->description('Venta, total de venta y detalles del pedido')
                     ->schema([
-                        Forms\Components\datePicker::make('created_at')
+                        datePicker::make('created_at')
                             ->label('Fecha de venta')
                             ->prefixIcon('heroicon-o-calendar-date-range')
                             ->disabled()
