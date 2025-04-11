@@ -41,29 +41,31 @@ class StatsGeneral extends BaseWidget
     protected function getStats(): array
     {
 
-        $ingresos_netos = UtilsController::ingresosNetos();
+        $ingresos           = UtilsController::ingresos();
+        $egresos            = UtilsController::egresos();
+        $producto_max_venta = UtilsController::producto_max_venta();
 
         return [
 
-            Stat::make('SEDES ATENDIDAS', 12)
+            Stat::make('TOTAL INGRESOS EN DOLARES US$', number_format($ingresos, 2).' US$')
                 ->description(round(12) . '%')
                 // ->descriptionIcon($servicios['icon'])
                 // ->color($servicios['color'])
                 ->extraAttributes(['class' => 'col-span-2 row-span-1 rounded-md text-center content-center']),
 
-            Stat::make('TOTAL DE VALUACIONES', 12 . 12)
+            Stat::make('TOTAL EGRESOS EN DOLARES US$', number_format($egresos, 2) . ' US$')
                 ->description(round(12) . '%')
-                // ->descriptionIcon('servicios_usd'['icon'])
-                // ->color('servicios_usd'['color'])
+                // ->descriptionIcon($servicios['icon'])
+                // ->color($servicios['color'])
                 ->extraAttributes(['class' => 'col-span-2 row-span-1 rounded-md text-center content-center']),
 
-            Stat::make('INGRESOS', round(12, 2))
+            Stat::make('VENTA NETA EN DOLARES US$', number_format($ingresos - $egresos, 2) . ' US$')
                 ->description(12 . '% ')
                 // ->descriptionIcon('servicios_usd'['icon'])
                 // ->color('servicios_usd'['color'])
                 ->extraAttributes(['class' => 'col-span-2 row-span-1 rounded-md text-center content-center']),
 
-            Stat::make('EGRESOS', 12)
+            Stat::make('PRODUCTO MAS VENDIDO', $producto_max_venta)
                 ->description(round(12) . '%')
                 // ->descriptionIcon('label'['icon'])
                 // ->color('red')
@@ -72,11 +74,11 @@ class StatsGeneral extends BaseWidget
         ];
     }
 
-    protected int | string | array $columnSpan = [
-        // 'xs' => 3,
-        'sm' => 2,
-        'md' => 2,
-        'xl' => 2,
-    ];
+    // protected int | string | array $columnSpan = [
+    //     // 'xs' => 3,
+    //     'sm' => 2,
+    //     'md' => 4,
+    //     'xl' => 4,
+    // ];
 
 }
