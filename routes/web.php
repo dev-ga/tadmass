@@ -2,8 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
-//Como crear una migracion con los campos necesarion para un tabla que almacena informacion sobre productos y articulos medico quirurgicos en laravel 12 ?
+//Para forzar la redireccion al login de filament
+Route::redirect('/', '/admin');
