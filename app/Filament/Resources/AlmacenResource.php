@@ -5,17 +5,21 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
+use Pages\EditPedido;
 use App\Models\Almacen;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\AlmacenResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\AlmacenResource\RelationManagers;
+use App\Filament\Resources\AlmacenResource\Pages\EditAlmacen;
 
 class AlmacenResource extends Resource
 {
@@ -45,7 +49,8 @@ class AlmacenResource extends Resource
                                 ->dehydrated()
                                 ->unique()
                                 ->dehydrated()
-                                ->maxLength(255),
+                                ->maxLength(255)
+                                ->hiddenOn([EditAlmacen::class]),
 
                         ])->columns(4),
 
@@ -120,7 +125,19 @@ class AlmacenResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->color('azul')
+                        ->modalWidth(MaxWidth::FiveExtraLarge),
+                    Tables\Actions\EditAction::make()
+                        ->color('verdeOscuro'), 
+                    Tables\Actions\DeleteAction::make()
+                        ->color('danger')
+                ])
+                ->icon('heroicon-c-bars-3-bottom-right')
+                ->button()
+                ->label('Acciones')
+                ->color('azul')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

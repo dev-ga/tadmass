@@ -132,7 +132,8 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
                 
             ])
-            ->maxContentWidth(MaxWidth::Full);
+            ->maxContentWidth(MaxWidth::Full)
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 
     public function boot(): void

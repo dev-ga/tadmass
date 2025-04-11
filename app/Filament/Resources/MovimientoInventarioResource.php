@@ -20,14 +20,6 @@ class MovimientoInventarioResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-c-shopping-cart';
 
-    // public static function form(Form $form): Form
-    // {
-    //     return $form
-    //         ->schema([
-    //             //
-    //         ]);
-    // }
-
     public static function table(Table $table): Table
     {
         return $table
@@ -46,6 +38,7 @@ class MovimientoInventarioResource extends Resource
                         return match ($state) {
                             'entrada' => 'verdeOscuro',
                             'salida' => 'danger',
+                            'reposicion' => 'azul',       
                         };
                     })
                     ->searchable(),
@@ -77,33 +70,6 @@ class MovimientoInventarioResource extends Resource
             ])
             ->filters([
                 //
-            ])
-            ->actions([
-                // ActionGroup::make([
-                //     // Tables\Actions\ViewAction::make(),
-                //     // Tables\Actions\EditAction::make(),
-                //     Tables\Actions\DeleteAction::make(), 
-                // ])
-                // // ->link()
-                // ->icon('heroicon-c-bars-3-bottom-right')
-                // ->button()
-                // ->label('Acciones')
-                // ->color('azul')
-            ])
-            ->headerActions([
-                // Tables\Actions\ExportAction::make()
-                //     ->icon('heroicon-m-arrow-down-tray')
-                //     ->color('verdeOscuro')
-                //     ->exporter(PedidoExporter::class)
-                //     ->formats([
-                //         ExportFormat::Xlsx,
-                //         ExportFormat::Csv,
-                //     ])
-            ])
-            ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
             ]);
     }
 

@@ -181,48 +181,37 @@ class InventarioResource extends Resource
                             }
                         }),
                     Tables\Actions\Action::make('Reposicion')
-                        ->label('Mover Existencia')
-                        ->color('azul')
-                        ->icon('heroicon-s-truck')
+                        ->label('Reposicion')
+                        ->color('verdeOscuro')
+                        ->icon('heroicon-s-arrow-path')
                         ->form([
                             Section::make('MOVER EXISTENCIA')
                                 ->icon('heroicon-s-truck')
                                 ->description('Fomrulario de Mover Existencia de los productos del almacén mayorista al almacén detal')
                                 ->schema([
-                                    Forms\Components\Select::make('almacen_id')
-                                        ->prefixIcon('heroicon-c-clipboard-document-list')
-                                        ->options(Almacen::select('id', 'nombre')->where('tipo_almacen', 'detal')->pluck('nombre', 'id'))
-                                        ->preload()
-                                        ->searchable()
-                                        // ->relationship('almacen', 'nombre')
-                                        ->required(),
                                     Forms\Components\TextInput::make('cantidad')
-                                        ->label('Cantidad en Bultos')
+                                        ->label('Cantidad')
+                                        ->numeric()
                                         ->prefixIcon('heroicon-c-clipboard-document-list')
-                                        ->required(),
-                                    Forms\Components\TextInput::make('precio_venta')
-                                        ->prefixIcon('heroicon-c-clipboard-document-list')
-                                        ->label('Precio Venta en US$')
-                                        ->hint('Separador decimal(.)')
                                         ->required(),
 
                                 ])->columns(2),
                         ])
                         ->action(function ($record, array $data) {
 
-                            $mover_existencia_individual = MovimientoInventarioController::mover_existencia_individual($record, $data);
+                            $reponer = MovimientoInventarioController::reponer_existencia($record, $data);
 
-                            if ($mover_existencia_individual['success'] == true) {
+                            if ($reponer['success'] == true) {
                                 Notification::make()
                                     ->success()
                                     ->title('Movimiento Exitoso')
-                                    ->body($mover_existencia_individual['message'])
+                                    ->body($reponer['message'])
                                     ->send();
                             } else {
                                 Notification::make()
                                     ->danger()
                                     ->title('Error')
-                                    ->body($mover_existencia_individual['message'])
+                                    ->body($reponer['message'])
                                     ->send();
                             }
                         }),
@@ -234,55 +223,55 @@ class InventarioResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('Mover Existencia')
-                        ->label('Mover Existencia')
-                        ->color('azul')
-                        ->icon('heroicon-s-truck')
-                        ->form([
-                            Section::make('MOVER EXISTENCIA')
-                                ->icon('heroicon-s-truck')
-                                ->description('Fomrulario de Mover Existencia de los productos del almacén mayorista al almacén detal')
-                                ->schema([
-                                    Forms\Components\Select::make('almacen_id')
-                                        ->prefixIcon('heroicon-c-clipboard-document-list')
-                                        ->options(Almacen::select('id', 'nombre')->where('tipo_almacen', 'detal')->pluck('nombre', 'id'))
-                                        ->preload()
-                                        ->searchable()
-                                        // ->relationship('almacen', 'nombre')
-                                        ->required(),
-                                    Forms\Components\TextInput::make('cantidad')
-                                        ->label('Cantidad en Bultos')
-                                        ->prefixIcon('heroicon-c-clipboard-document-list')
-                                        ->required(),
-                                    Forms\Components\TextInput::make('precio_venta')
-                                        ->prefixIcon('heroicon-c-clipboard-document-list')
-                                        ->label('Precio Venta en US$')
-                                        ->hint('Separador decimal(.)')
-                                        ->required(),
+                    // Tables\Actions\BulkAction::make('Mover Existencia')
+                    //     ->label('Mover Existencia')
+                    //     ->color('azul')
+                    //     ->icon('heroicon-s-truck')
+                    //     ->form([
+                    //         Section::make('MOVER EXISTENCIA')
+                    //             ->icon('heroicon-s-truck')
+                    //             ->description('Fomrulario de Mover Existencia de los productos del almacén mayorista al almacén detal')
+                    //             ->schema([
+                    //                 Forms\Components\Select::make('almacen_id')
+                    //                     ->prefixIcon('heroicon-c-clipboard-document-list')
+                    //                     ->options(Almacen::select('id', 'nombre')->where('tipo_almacen', 'detal')->pluck('nombre', 'id'))
+                    //                     ->preload()
+                    //                     ->searchable()
+                    //                     // ->relationship('almacen', 'nombre')
+                    //                     ->required(),
+                    //                 Forms\Components\TextInput::make('cantidad')
+                    //                     ->label('Cantidad en Bultos')
+                    //                     ->prefixIcon('heroicon-c-clipboard-document-list')
+                    //                     ->required(),
+                    //                 Forms\Components\TextInput::make('precio_venta')
+                    //                     ->prefixIcon('heroicon-c-clipboard-document-list')
+                    //                     ->label('Precio Venta en US$')
+                    //                     ->hint('Separador decimal(.)')
+                    //                     ->required(),
                                     
-                                ])->columns(2),
-                        ])
-                        ->action(function (Collection $records, array $data) {
-                            // dd(str_replace('-M-', '-D-',  $records[0]->codigo), $records[0]->codigo, $records);
-                            for ($i = 0; $i < count($records); $i++) {
-                                $mover_existencia = MovimientoInventarioController::mover_existencia_masiva($records[$i], $data);
+                    //             ])->columns(2),
+                    //     ])
+                    //     ->action(function (Collection $records, array $data) {
+                    //         // dd(str_replace('-M-', '-D-',  $records[0]->codigo), $records[0]->codigo, $records);
+                    //         for ($i = 0; $i < count($records); $i++) {
+                    //             $mover_existencia = MovimientoInventarioController::mover_existencia_masiva($records[$i], $data);
 
-                                if ($mover_existencia['success'] == true) {
-                                    Notification::make()
-                                        ->success()
-                                        ->title('Movimiento Masivo Exitoso')
-                                        ->body($mover_existencia['message'])
-                                        ->send();
-                                } else {
-                                    Notification::make()
-                                        ->danger()
-                                        ->title('Error')
-                                        ->body($mover_existencia['message'])
-                                        ->send();
-                                }
-                            }
+                    //             if ($mover_existencia['success'] == true) {
+                    //                 Notification::make()
+                    //                     ->success()
+                    //                     ->title('Movimiento Masivo Exitoso')
+                    //                     ->body($mover_existencia['message'])
+                    //                     ->send();
+                    //             } else {
+                    //                 Notification::make()
+                    //                     ->danger()
+                    //                     ->title('Error')
+                    //                     ->body($mover_existencia['message'])
+                    //                     ->send();
+                    //             }
+                    //         }
 
-                        }),
+                    //     }),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

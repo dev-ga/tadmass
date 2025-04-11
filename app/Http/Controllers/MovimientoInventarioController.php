@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Producto;
+use App\Models\Inventario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -198,6 +199,43 @@ class MovimientoInventarioController extends Controller
                 ];
             }
 
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::error($th->getMessage());
+            return [
+                'success' => false,
+                'message' => $th->getMessage()
+            ];
+        }
+    }
+
+    static function reponer_existencia($record, $data_formulario){
+        
+        try {
+            // dd($data_formulario, $record);
+            DB::transaction(function () use ($record, $data_formulario) {
+                
+                $record = Inventario::select('existencia', 'codigo', 'producto_id', 'unidad_medida', 'id')->where('producto_id', $record->producto_id)->first();
+                $record->existencia = $record->existencia + $data_formulario['cantidad'];
+                $record->save();
+
+                $movimiento_inventario = new \App\Models\MovimientoInventario();
+                $movimiento_inventario->inventario_id   = $record->id;
+                $movimiento_inventario->producto_id     = $record->producto_id;
+                $movimiento_inventario->codigo_producto = $record->codigo;
+                $movimiento_inventario->cantidad        = $data_formulario['cantidad'];
+                $movimiento_inventario->tipo            = 'reposicion';
+                $movimiento_inventario->unidad_medida   = $record->unidad_medida;
+                $movimiento_inventario->registrado_por  = Auth::user()->name;
+                $movimiento_inventario->save();
+                
+            });
+            
+            return [
+                'success' => true,
+                'message' => "La reposicion del producto se ha realizado con exito",
+            ];
+            
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error($th->getMessage());

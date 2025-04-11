@@ -36,7 +36,10 @@ class UserResource extends Resource
                         ->email()
                         ->required()
                         ->maxLength(255),
-                    Forms\Components\DateTimePicker::make('email_verified_at'),
+                    Forms\Components\DateTimePicker::make('email_verified_at')
+                        ->disabled()
+                        ->dehydrated()
+                        ->default(now()),
                     Forms\Components\TextInput::make('password')
                         ->password()
                         ->required()
@@ -76,7 +79,19 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+            ActionGroup::make([
+                Tables\Actions\ViewAction::make()
+                    ->color('azul')
+                    ->modalWidth(MaxWidth::FiveExtraLarge),
+                Tables\Actions\EditAction::make()
+                    ->color('verdeOscuro'),
+                Tables\Actions\DeleteAction::make()
+                    ->color('danger')
+            ])
+                ->icon('heroicon-c-bars-3-bottom-right')
+                ->button()
+                ->label('Acciones')
+                ->color('azul')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

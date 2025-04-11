@@ -1,0 +1,23 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+.fi-sidebar-nav {
+    @apply bg-black !important;
+}
+
+.fi-topbar nav {
+    @apply bg-[#30daf5] !important;
+}
+
+.fi-sidebar-header {
+    @apply bg-[#30daf5] !important;
+}
+
+.fi-sidebar-item-label {
+    @apply text-white !important;
+}
+
+.fi-sidebar-item-icon {
+    @apply text-[#04C4D9] !important;
+}
