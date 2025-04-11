@@ -10,6 +10,8 @@ class ListVentas extends ListRecords
 {
     protected static string $resource = VentaResource::class;
 
+    protected static ?string $title = 'Gestion Administrativa: Ventas';
+
     protected function getHeaderActions(): array
     {
         return [

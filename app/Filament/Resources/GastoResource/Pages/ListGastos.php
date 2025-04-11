@@ -10,6 +10,8 @@ class ListGastos extends ListRecords
 {
     protected static string $resource = GastoResource::class;
 
+    protected static ?string $title = 'Gestion Administrativa: Gastos';
+
     protected function getHeaderActions(): array
     {
         return [

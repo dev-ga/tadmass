@@ -10,6 +10,9 @@ class ListVendedors extends ListRecords
 {
     protected static string $resource = VendedorResource::class;
 
+    protected static ?string $title = 'Gestion de Vendedores';
+
+
     protected function getHeaderActions(): array
     {
         return [

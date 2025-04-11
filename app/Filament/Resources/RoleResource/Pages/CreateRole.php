@@ -12,6 +12,9 @@ class CreateRole extends CreateRecord
 {
     protected static string $resource = RoleResource::class;
 
+    protected static ?string $title = 'Roles y Permisos';
+
+
     public Collection $permissions;
 
     protected function mutateFormDataBeforeCreate(array $data): array

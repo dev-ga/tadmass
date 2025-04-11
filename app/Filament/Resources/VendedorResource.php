@@ -9,8 +9,10 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\VendedorResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -118,7 +120,19 @@ class VendedorResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+            ActionGroup::make([
+                Tables\Actions\ViewAction::make()
+                    ->color('azul')
+                    ->modalWidth(MaxWidth::FiveExtraLarge),
+                Tables\Actions\EditAction::make()
+                    ->color('verdeOscuro'),
+                Tables\Actions\DeleteAction::make()
+                    ->color('danger')
+            ])
+                ->icon('heroicon-c-bars-3-bottom-right')
+                ->button()
+                ->label('Acciones')
+                ->color('azul')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

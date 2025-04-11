@@ -10,6 +10,8 @@ class ListInventarios extends ListRecords
 {
     protected static string $resource = InventarioResource::class;
 
+    protected static ?string $title = 'Gestion de Inventario';
+
     protected function getHeaderActions(): array
     {
         return [

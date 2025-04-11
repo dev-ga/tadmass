@@ -10,6 +10,8 @@ class ListPedidos extends ListRecords
 {
     protected static string $resource = PedidoResource::class;
 
+    protected static ?string $title = 'Gestion Administrativa: Pedidos';
+
     protected function getHeaderActions(): array
     {
         return [
