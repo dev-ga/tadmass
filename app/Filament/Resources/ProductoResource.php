@@ -12,15 +12,16 @@ use Filament\Forms\Form;
 use App\Models\Categoria;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Illuminate\Support\Facades\Log;
 use Filament\Forms\Components\Radio;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\ToggleButtons;
@@ -315,17 +316,19 @@ class ProductoResource extends Resource
                 //
             ])
             ->actions([
-                ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
-                    ->color('azul'),
-                    Tables\Actions\EditAction::make()
+            ActionGroup::make([
+                Tables\Actions\ViewAction::make()
+                    ->color('azul')
+                    ->modalWidth(MaxWidth::FiveExtraLarge),
+                Tables\Actions\EditAction::make()
                     ->color('verdeOscuro'),
-                    Tables\Actions\DeleteAction::make(),
-                ])
-                // ->link()
+                Tables\Actions\DeleteAction::make()
+                    ->color('danger')
+            ])
                 ->icon('heroicon-c-bars-3-bottom-right')
                 ->button()
                 ->label('Acciones')
+                ->color('azul')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

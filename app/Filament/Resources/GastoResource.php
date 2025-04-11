@@ -14,7 +14,9 @@ use Filament\Tables\Table;
 use App\Models\Configuracion;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\ToggleButtons;
 use App\Filament\Resources\GastoResource\Pages;
@@ -234,7 +236,7 @@ class GastoResource extends Resource
                             ->default(0.00),
 
                         Forms\Components\TextInput::make('total_gasto_bsd')
-                            ->label('Total Gasto en Bolivares(Bs.)')
+                            ->label('Total Gasto en Bolivares(VESBs.)')
                             ->prefixIcon('heroicon-m-credit-card')
                             ->live()
                             ->disabled()
@@ -244,7 +246,7 @@ class GastoResource extends Resource
                             ->placeholder('0.00'),
 
                         Forms\Components\TextInput::make('conversion_a_usd')
-                            ->label('Total Gasto en Dolares($)')
+                            ->label('Total Gasto en Dolares(US$)')
                             ->prefixIcon('heroicon-m-credit-card')
                             ->live()
                             ->disabled()
@@ -262,62 +264,73 @@ class GastoResource extends Resource
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
-                // Tables\Columns\TextColumn::make('nro_gasto')
-                //     ->searchable(),
                 Tables\Columns\TextColumn::make('codigo')
                     ->label('Código')
-                    ->searchable(),
+                    ->badge()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('descripcion')
                     ->label('Descripción')
-                    ->searchable(),
-                // Tables\Columns\TextColumn::make('tipo_gasto')
-                //     ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('numero_factura')
                     ->label('Número de Factura')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('nro_control')
-                    ->searchable(),
-                // Tables\Columns\TextColumn::make('fecha')
-                //     ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('fecha_factura')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('proveedor.nombre')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('metodo_pago')
                     ->label('Metodo de pago')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('tasa_bcv')
                     ->label('Tasa BCV')
+                    ->color('azul')
                     ->money('VES')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('monto_usd')
                     ->label('Monto US$')
+                    ->color('verdeOscuro')
                     ->money('USD')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('monto_bsd')
                     ->label('Monto VES(Bs.)')
+                    ->color('azul')
                     ->money('VES')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('iva')
                     ->label('IVA')
+                    ->color('azul')
                     ->money('VES')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('total_gasto_bsd')
                     ->label('Total gastos Bs.')
+                    ->color('azul')
                     ->money('VES')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('conversion_usd')
                     ->label('Conversión USD')
+                    ->color('verdeOscuro')
                     ->money('USD')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('registrado_por')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('registrado_por')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -326,7 +339,19 @@ class GastoResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+            ActionGroup::make([
+                Tables\Actions\ViewAction::make()
+                    ->color('azul')
+                    ->modalWidth(MaxWidth::FiveExtraLarge),
+                Tables\Actions\EditAction::make()
+                    ->color('verdeOscuro'),
+                Tables\Actions\DeleteAction::make()
+                    ->color('danger')
+            ])
+                ->icon('heroicon-c-bars-3-bottom-right')
+                ->button()
+                ->label('Acciones')
+                ->color('azul')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

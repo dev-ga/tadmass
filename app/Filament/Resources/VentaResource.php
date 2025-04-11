@@ -92,13 +92,8 @@ class VentaResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('prod_asociados')
                     ->label('Productos Asociados')
-                    // ->getStateUsing(function (Venta $record) {
-                    //     $array = json_decode($record->prod_asociados);
-                    //     return $array;
-                    // })
                     ->alignCenter()
                     ->listWithLineBreaks(),
-
                 Tables\Columns\TextColumn::make('metodo_pago')
                     ->label('Método de Pago')
                     ->badge()
@@ -106,10 +101,12 @@ class VentaResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total_venta_usd')
                     ->label('Venta US$')
+                    ->color('verdeOscuro')
                     ->money('USD')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_venta_bsd')
                     ->label('Venta VES(Bs.)')
+                    ->color('azul')
                     ->money('VES')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tasa_bcv')
@@ -119,14 +116,17 @@ class VentaResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('comision_usd')
                     ->label('Comisión US$')
+                    ->color('verdeOscuro')
                     ->money('USD')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('comision_bsd')
                     ->label('Comisión VES(Bs.)')
-                ->money('VES')
+                    ->color('azul')     
+                    ->money('VES')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('registrado_por')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -143,12 +143,15 @@ class VentaResource extends Resource
                 ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                 ])
-                // Tables\Actions\EditAction::make(),
+                ->icon('heroicon-c-bars-3-bottom-right')
+                ->button()
+                ->label('Acciones')
+                ->color('azul')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                ])
             ]);
     }
 
