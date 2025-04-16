@@ -31,14 +31,14 @@ class Dashboard extends \Filament\Pages\Dashboard
     use BaseDashboard\Concerns\HasFiltersForm;
 
 
-    protected static ?string $title = 'Dashboard';
+    // protected static ?string $title = 'Dashboard';
 
-    // public function getTitle(): string
-    // {
-    //     $user = Auth::user();
+    public function getTitle(): string
+    {
+        $user = Auth::user();
 
-    //     return 'Hola, ' . ($user ? $user->name : 'Invitado') . '.';
-    // }
+        return 'Hola, ' . ($user ? $user->name : 'Invitado') . '.';
+    }
 
     protected static ?string $navigationIcon = 'heroicon-c-presentation-chart-bar';
 

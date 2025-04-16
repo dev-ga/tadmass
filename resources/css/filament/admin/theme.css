@@ -3,21 +3,48 @@
 @config 'tailwind.config.js';
 
 .fi-sidebar-nav {
-    @apply bg-black !important;
+    background: linear-gradient(#b0f7d874, #acedf37b) !important;
+}
+
+.dark .fi-sidebar-nav {
+    background: transparent !important;
 }
 
 .fi-topbar nav {
-    @apply bg-[#30daf5] !important;
+    background-image: url(../../../../public/images/bg.png) !important;
+    /* @apply bg-[#30daf5] !important; */
+}
+
+.dark .fi-topbar nav {
+    background: transparent !important;
+}
+
+.dark .fi-sidebar-header {
+    background: transparent !important;
 }
 
 .fi-sidebar-header {
-    @apply bg-[#30daf5] !important;
+    background-image: url(../../../../public/images/bg.png) !important;
 }
 
+
 .fi-sidebar-item-label {
-    @apply text-white !important;
+    /* @apply text-white !important; */
 }
 
 .fi-sidebar-item-icon {
     @apply text-[#04C4D9] !important;
+}
+
+.fi-wi-stats-overview-stat .flex {
+    justify-content: center;
+}
+
+.fi-wi-stats-overview-stat {
+    background-image: url(../../../../public/images/bg-stat.png) !important;
+    background-size: cover;
+}
+
+.dark .fi-wi-stats-overview-stat {
+    background: #18181b !important;
 }

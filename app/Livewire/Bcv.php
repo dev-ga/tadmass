@@ -57,7 +57,7 @@ class Bcv extends Component implements HasForms, HasActions
 
                 $this->dispatch('bcv-update');
             })
-            ->modalSubmitActionLabel('Actualiazar');
+            ->modalSubmitActionLabel('Actualizar');
     }
 
 

@@ -29,6 +29,8 @@ use Filament\Tables\View\TablesRenderHook as ViewTablesRenderHook;
 
 class AdminPanelProvider extends PanelProvider
 {
+
+
     public function panel(Panel $panel): Panel
     {
         // $panelHooks = new ReflectionClass(PanelsRenderHook::class);
@@ -62,6 +64,8 @@ class AdminPanelProvider extends PanelProvider
         //         ]);
         //     });
         // }
+
+
 
         return $panel
             ->default()
@@ -104,9 +108,9 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::TOPBAR_END, function () {
                 return view('topbar-end-bcv');
             })
-            // ->renderHook(PanelsRenderHook::PAGE_HEADER_WIDGETS_BEFORE, function () {
-            //     return view('bcv');
-            // })
+            ->renderHook(PanelsRenderHook::SIDEBAR_NAV_END , function () {
+                return view('footer-menu');
+            })
             ->sidebarFullyCollapsibleOnDesktop()
             ->brandLogo(asset('images/tadmasLogo.png'))
             ->darkModeBrandLogo(asset('images/tadmasLogoWhite.png'))
@@ -120,7 +124,7 @@ class AdminPanelProvider extends PanelProvider
                 'Configuración',
             ])
             ->databaseNotifications()
-            ->middleware([  
+            ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
@@ -130,7 +134,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                
+
             ])
             ->maxContentWidth(MaxWidth::Full)
             ->viteTheme('resources/css/filament/admin/theme.css');

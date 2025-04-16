@@ -2,7 +2,7 @@
     <div>
         <div class="flex content-center">
             <x-filament-actions::modals />
-            <div class="flex items-center p-2">
+            <div class="flex items-center p-2" style="padding-left: 0 !important;">
                 <div>
                         <img id="theme-mode"
                             x-data="{ darkMode: document.documentElement.classList.contains('dark') }"
@@ -24,3 +24,5 @@
         </div>
     </div>
 </div>
+
+

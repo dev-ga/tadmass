@@ -24,7 +24,7 @@ class AvancesDashChart extends ChartWidget
 
     protected static ?string $heading = '% de Avances';
 
-    protected static ?string $maxHeight = '180px';
+    protected static ?string $maxHeight = '250px';
 
     protected static ?int $sort = 4;
 
@@ -69,8 +69,8 @@ class AvancesDashChart extends ChartWidget
                     'label' => '',
                     'data' => [2, 5],
                     'backgroundColor' => [
-                        '#42708C',
-                        '#8C4014',
+                        '#04C4D9',
+                        '#238C3D',
                     ],
                     'borderColor' => '#ffff',
                 ],

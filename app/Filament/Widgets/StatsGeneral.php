@@ -51,30 +51,30 @@ class StatsGeneral extends BaseWidget
                 ->description(round(12) . '%')
                 // ->descriptionIcon($servicios['icon'])
                 // ->color($servicios['color'])
-                ->extraAttributes(['class' => 'col-span-2 row-span-1 rounded-md text-center content-center']),
+                ->extraAttributes(['class' => 'col-span-1 row-span-1 rounded-md text-center content-center']),
 
             Stat::make('TOTAL EGRESOS EN DOLARES US$', number_format($egresos, 2) . ' US$')
                 ->description(round(12) . '%')
                 // ->descriptionIcon($servicios['icon'])
                 // ->color($servicios['color'])
-                ->extraAttributes(['class' => 'col-span-2 row-span-1 rounded-md text-center content-center']),
+                ->extraAttributes(['class' => 'col-span-1 row-span-1 rounded-md text-center content-center']),
 
             Stat::make('VENTA NETA EN DOLARES US$', number_format($ingresos - $egresos, 2) . ' US$')
                 ->description(12 . '% ')
                 // ->descriptionIcon('servicios_usd'['icon'])
                 // ->color('servicios_usd'['color'])
-                ->extraAttributes(['class' => 'col-span-2 row-span-1 rounded-md text-center content-center']),
+                ->extraAttributes(['class' => 'col-span-1 row-span-1 rounded-md text-center content-center']),
 
             Stat::make('PRODUCTO MAS VENDIDO', $producto_max_venta)
                 ->description(round(12) . '%')
                 // ->descriptionIcon('label'['icon'])
                 // ->color('red')
-                ->extraAttributes(['class' => 'col-span-2 row-span-1 rounded-md text-center content-center']),
+                ->extraAttributes(['class' => 'col-span-1 row-span-1 rounded-md text-center content-center']),
 
         ];
     }
 
-    // protected int | string | array $columnSpan = [
+    // protected int | string | array $columnSpan = [ 
     //     // 'xs' => 3,
     //     'sm' => 2,
     //     'md' => 4,

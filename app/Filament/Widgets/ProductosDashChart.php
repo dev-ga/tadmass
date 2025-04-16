@@ -42,6 +42,14 @@ class ProductosDashChart extends ChartWidget
         //     ->get();
 
         // $labels = $data->map(fn($data) => $data->descripcion);
+
+        $labels = [
+            '1',
+            '2',
+            '3',
+            '4',
+            '5',
+        ];
         // $totalVentas = $data->sum('venta');
         // $percentages = $data->map(fn($item) => round(($item->venta / $totalVentas) * 100, 2));
 
@@ -56,13 +64,13 @@ class ProductosDashChart extends ChartWidget
                     // 'data' => $data->map(fn($data) => $data->venta),
                     'data' => [2,3,4,5,6],
                     'backgroundColor' => [
-                        '#a16d69',
-                        '#99bcbf',
-                        '#bf99a9',
-                        '#bfaf99',
-                        '#99a9bf',
-                        '#99bfaf',
-                        '#9c99bf',
+                        '#1ED9C6',
+                        '#238C3D',
+                        '#04C4D9',
+                        '#49F262',
+                        '#05AFF2',
+                        '#49F262',
+                        '#37c3fb',
                         '#99bf9c',
                         '#bf9c99',
                         '#bf99bc',
@@ -79,19 +87,21 @@ class ProductosDashChart extends ChartWidget
                         '#a67b9a',
                         '#56737f'
                     ],
+                    'borderWidth' => 0,
                     // 'borderColor' => '#22c55e',
                     // 'fill' => true,
                 ],
             ],
+            'labels' => $labels,
             // 'labels' => $labelsWithPercentages->toArray(),
             // 'percentages' => $percentages,
         ];
     }
 
-    public function getDescription(): ?string
-    {
-        return 'Productos vendidos';
-    }
+    // public function getDescription(): ?string
+    // {
+    //     return 'Productos vendidos';
+    // }
 
     protected static ?array $options = [
         'scales' => [
